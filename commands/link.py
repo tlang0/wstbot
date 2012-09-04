@@ -6,7 +6,7 @@ class Link(object):
         parser = ConfigParser.SafeConfigParser()
         parser.read("wstbot.conf")
         address = parser.get("server_config", "address")
-        return address
+        return address + "/images"
     
     def get_cmd(self):
         return "link"
