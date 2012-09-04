@@ -1,0 +1,7 @@
+[
+    [
+        "slashdot.org", 
+        "((https?://)(www\\.)?(.*\\.)?slashdot\\.org/.*)", 
+        "<title>(.*) - Slashdot"
+    ]
+]
