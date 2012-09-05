@@ -3,8 +3,14 @@ import cherrypy
 import time
 import shutil
 
+# server constants
 SERVER_PATH = "botserver"
+SERVER_CONFIG_PATH = os.path.join(SERVER_PATH, "cherryserver.conf")
+
+# image constants
 TEMPLATES_PATH = os.path.join(SERVER_PATH, "templates")
+
+# news constants
 REGEX_FILE = "REGEX"
 REGEX_BACKUP_DIR = "newsbackups"
 REGEX_BACKUP_PATH = os.path.join(SERVER_PATH, REGEX_BACKUP_DIR)
@@ -39,11 +45,11 @@ class ImageListBuilder(object):
             # insert links to previous and next page
             images_html += "<p>\n"
             if pos_in_list > 0:
-                images_html += '''<a href="/images/{0}" title="previous page"><- previous page
-                    </a>&nbsp;\n'''.format(filelist[pos_in_list - 1])
+                images_html += ('<a href="/images/{0}" title="previous page">&lt;- previous page'
+                    + '</a>&nbsp;\n').format(filelist[pos_in_list - 1])
             if pos_in_list < len(filelist) - 1:
-                images_html += '''<a href="/images/{0}" title="next page">next page ->
-                    </a>\n'''.format(filelist[pos_in_list + 1])
+                images_html += ('<a href="/images/{0}" title="next page">next page -&gt;'
+                    + '</a>\n').format(filelist[pos_in_list + 1])
             images_html += "</p>\n"
 
             # insert images
@@ -105,6 +111,9 @@ class CherryServer(object):
         else:
             return updater.update(newsregex)
 
+    def style(self):
+        return self.get_template("style.css")
+
     def get_template(self, name):
         try:
             path = os.path.join(TEMPLATES_PATH, name)
@@ -118,7 +127,21 @@ class CherryServer(object):
     index.exposed = True
     images.exposed = True
     news.exposed = True
+    style.exposed = True
 
 def start(port):
-    cherrypy.config.update({"server.socket_port": port, "server.socket_host": "0.0.0.0"})
-    cherrypy.quickstart(CherryServer())
+    cherrypy.config.update({
+        "server.socket_port": port,
+        "server.socket_host": "0.0.0.0"
+    })
+    app_path = os.path.dirname(os.path.abspath(__file__))
+    config = {
+        "/style.css":
+        {
+            "tools.staticfile.on": True,
+            "tools.staticfile.filename": os.path.join(app_path, "templates/style.css")
+        }
+    }
+    cherrypy.tree.mount(CherryServer(), "/", config=config)
+    cherrypy.engine.start()
+    cherrypy.engine.block()

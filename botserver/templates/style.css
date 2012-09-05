@@ -1,0 +1,13 @@
+body {
+  font-family: sans-serif;
+  font-size: 10pt;
+}
+
+hr {
+  border: 0;
+  width: 100%;
+  color: #000;
+  background-color: #000;
+  height: 2px;
+}
+

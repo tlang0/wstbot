@@ -67,15 +67,15 @@ class WstBot(wirc.wIRC):
         self.server_port = server_port
 
         # try to start server
-        if module_exists("botserver"):
-            import botserver
-            bot_server = botserver.Server()
-            if module_exists(bot_server.dependency):
-                thread.start_new_thread(bot_server.start, (server_port,))
-            else:
-                self.log.warn("Dependency for server not met!")
-        else:
-            self.log.warn("No server module found!")
+        #if module_exists("botserver"):
+        #    import botserver
+        #    bot_server = botserver.Server()
+        #    if module_exists(bot_server.dependency):
+        #        thread.start_new_thread(bot_server.start, (server_port,))
+        #    else:
+        #        self.log.warn("Dependency for server not met!")
+        #else:
+        #    self.log.warn("No server module found!")
 
     def objects_from_files(self, directory):
         """
