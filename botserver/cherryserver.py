@@ -16,8 +16,8 @@ REGEX_BACKUP_DIR = "newsbackups"
 REGEX_BACKUP_PATH = os.path.join(SERVER_PATH, REGEX_BACKUP_DIR)
 
 class ImageListBuilder(object):
-    """Build a html image list from json image files containing lists of image URLs.
-    In the html template, #{images} will be replaced by the list"""
+    """Build a html image list from files containing the image URLs.
+    In the html template, {{images}} will be replaced by the list"""
 
     IMAGES_DIR = os.path.join(SERVER_PATH, "images")
 

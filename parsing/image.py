@@ -16,6 +16,7 @@ class Image(object):
 
         self.working = True
         filelist = os.listdir(self.SERVER_IMAGES_PATH) 
+        filelist.sort()
         if len(filelist) <= 0:
             new_file_name = "1"
         else:

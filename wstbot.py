@@ -109,7 +109,8 @@ class WstBot(wirc.wIRC):
     # Send a formatted message
     def formatted_msg(self, chan, msg, addcolor=True):
         def sendline(line):
-            if line != '': # ignore empty lines
+            if line != "": # ignore empty lines
+                line = line.encode("ascii", "ignore")
                 if addcolor:
                     self.msg(chan, str(C.NORMAL + line))
                 else:
