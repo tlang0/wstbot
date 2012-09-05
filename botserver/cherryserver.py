@@ -1,8 +1,13 @@
 import os
 import cherrypy
+import time
+import shutil
 
 SERVER_PATH = "botserver"
 TEMPLATES_PATH = os.path.join(SERVER_PATH, "templates")
+REGEX_FILE = "REGEX"
+REGEX_BACKUP_DIR = "newsbackups"
+REGEX_BACKUP_PATH = os.path.join(SERVER_PATH, REGEX_BACKUP_DIR)
 
 class ImageListBuilder(object):
     """Build a html image list from json image files containing lists of image URLs.
@@ -19,6 +24,7 @@ class ImageListBuilder(object):
             print("No image files found!")
             images_html = "No images yet!"
         else:
+            filelist.sort()
             if page is not None and page in filelist:
                 shown_page = page
             else:
@@ -51,6 +57,38 @@ class ImageListBuilder(object):
 
         return template.replace("{{images}}", images_html)
 
+class NewsUpdater(object):
+    """Updates the regex info for news headline retrieval"""
+    
+    def update(self, regexdata):
+        if regexdata is None:
+            print("New regex data was None!")
+
+        if not os.path.exists(REGEX_FILE):
+            print("No previous regex data!")
+        else:
+            # backup old regex file
+            if not os.path.exists(REGEX_BACKUP_PATH):
+                os.mkdir(REGEX_BACKUP_PATH)
+
+            shutil.copyfile(REGEX_FILE, os.path.join(REGEX_BACKUP_PATH, REGEX_FILE + str(time.time())))
+
+        # write new regex
+        fp = open(REGEX_FILE, "wb")
+        fp.write(regexdata.encode("utf-8"))
+        fp.close()
+
+        return "New news file was written."
+
+    def make_page(self, template):
+        if not os.path.exists(REGEX_FILE):
+            return template.replace("{{regexdata}}", "")
+        else:
+            fp = open(REGEX_FILE, "rb")
+            content = fp.read()
+            fp.close()
+            return template.replace("{{regexdata}}", content)
+
 class CherryServer(object):
 
     def index(self):
@@ -59,6 +97,13 @@ class CherryServer(object):
     def images(self, page=None):
         builder = ImageListBuilder() 
         return builder.build(self.get_template("images.html"), page)
+
+    def news(self, newsregex=None):
+        updater = NewsUpdater()
+        if newsregex is None:
+            return updater.make_page(self.get_template("news.html"))
+        else:
+            return updater.update(newsregex)
 
     def get_template(self, name):
         try:
@@ -72,7 +117,8 @@ class CherryServer(object):
 
     index.exposed = True
     images.exposed = True
+    news.exposed = True
 
 def start(port):
-    cherrypy.config.update({"server.socket_port": port})
+    cherrypy.config.update({"server.socket_port": port, "server.socket_host": "0.0.0.0"})
     cherrypy.quickstart(CherryServer())
