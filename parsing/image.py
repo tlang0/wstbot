@@ -27,10 +27,12 @@ class Image(object):
         self.num_imagelinks = 0
     
     def imgur(self, url):
+        print("imgur link")
         content = urllib2.urlopen(url).read()
-        #match = re.search('<link rel="image_src" href="(.*)"', content)
-        match = re.search('<a href="(.*)" target="_blank">View full resolution', content)
+        #match = re.search('<a href="(.*)" target="_blank">View full resolution', content)
+        match = re.search('<link rel="image_src" href="(.*)"\s*/>', content)
         if match:
+            print("imgur match")
             imageurl = match.groups()[0]
             if imageurl:
                 return imageurl
@@ -41,7 +43,7 @@ class Image(object):
         if not self.working or msg[-1] == "*":
             return
         
-        imgurmatch = re.search("((http://|www\.)imgur.com/gallery/((\d|\w)*)(/)?)", msg)
+        imgurmatch = re.search("((https?://)(www\.)?imgur.com/((\d|\w)*)(/)?)", msg)
         match = re.search("((http://|www\.).*(\.jpeg|\.jpg|\.png|\.gif))", msg)
         if imgurmatch:
             url = self.imgur(imgurmatch.groups()[0])
