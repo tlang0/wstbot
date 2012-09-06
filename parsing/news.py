@@ -58,6 +58,7 @@ class News(object):
             if match.groups() is None or match.groups()[0] is None:
                 print("Found match but no groups")
                 try:
+                    print("the pattern was: " + news[2])
                     print("match.groups(): " + str(match.groups()))
                     print("match.group(0): " + str(match.group(0)))
                     print("match.group(1): " + str(match.group(1)))

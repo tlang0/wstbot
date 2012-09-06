@@ -46,28 +46,35 @@ class ImageListBuilder(object):
             image_list = fp.readlines()
 
             # insert links to previous and next page
-            images_html += "<p>\n"
+            prev_html=""
+            next_html=""
             if pos_in_list > 0:
-                images_html += ('<a href="/images/{0}" title="previous page">&lt;- previous page'
+                prev_html += ('<a href="/images/{0}" title="previous page">&lt;- previous page'
                     + '</a>&nbsp;\n').format(filelist[pos_in_list - 1])
             if pos_in_list < len(filelist) - 1:
-                images_html += ('<a href="/images/{0}" title="next page">next page -&gt;'
+                next_html += ('<a href="/images/{0}" title="next page">next page -&gt;'
                     + '</a>\n').format(filelist[pos_in_list + 1])
-            images_html += "</p>\n"
+            template = template.replace("{navprev}", prev_html)
+            template = template.replace("{navnext}", next_html)
 
             # insert images
+            i = 0
             for url in image_list:
                 if url[-1] == os.linesep:
                     url = url[:-1]
                 images_html += '<p><img src="{0}" alt="Some image" /></p>\n'.format(url)
-                images_html += "<hr />\n"
+                i += 1
+                if i < len(image_list):
+                  images_html += "<hr />\n"
 
             fp.close()
 
-        return template.replace("{{images}}", images_html)
+        return template.replace("{images}", images_html)
 
 class NewsUpdater(object):
     """Updates the regex info for news headline retrieval"""
+
+    NEEDLE = "{regexdata}"
     
     def update(self, regexdata):
         if regexdata is None:
@@ -91,12 +98,12 @@ class NewsUpdater(object):
 
     def make_page(self, template):
         if not os.path.exists(REGEX_FILE):
-            return template.replace("{{regexdata}}", "")
+            return template.replace(self.NEEDLE, "")
         else:
             fp = open(REGEX_FILE, "rb")
             content = fp.read()
             fp.close()
-            return template.replace("{{regexdata}}", content)
+            return template.replace(self.NEEDLE, content)
 
 class CherryServer(object):
 
