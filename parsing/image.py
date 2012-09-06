@@ -16,7 +16,8 @@ class Image(object):
 
         self.working = True
         filelist = os.listdir(self.SERVER_IMAGES_PATH) 
-        filelist.sort()
+        filelist_int = [int(x) for x in filelist]
+        filelist = [str(x) for x in sorted(filelist_int)]
         if len(filelist) <= 0:
             new_file_name = "1"
         else:
@@ -29,8 +30,9 @@ class Image(object):
     def imgur(self, url):
         print("imgur link")
         content = urllib2.urlopen(url).read()
-        #match = re.search('<a href="(.*)" target="_blank">View full resolution', content)
-        match = re.search('<link rel="image_src" href="(.*)"\s*/>', content)
+        match1 = re.search('<a href="(.*)" target="_blank">View full resolution', content)
+        match2 = re.search('<link rel="image_src" href="(.*)"\s*/>', content)
+        match = match1 or match2
         if match:
             print("imgur match")
             imageurl = match.groups()[0]
@@ -43,7 +45,7 @@ class Image(object):
         if not self.working or msg[-1] == "*":
             return
         
-        imgurmatch = re.search("((https?://)(www\.)?imgur.com/((\d|\w)*)(/)?)", msg)
+        imgurmatch = re.search("((https?://)(www\.)?imgur.com/(.*/)?((\d|\w)*)(/)?)", msg)
         match = re.search("((http://|www\.).*(\.jpeg|\.jpg|\.png|\.gif))", msg)
         if imgurmatch:
             url = self.imgur(imgurmatch.groups()[0])

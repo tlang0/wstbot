@@ -30,7 +30,10 @@ class ImageListBuilder(object):
             print("No image files found!")
             images_html = "No images yet!"
         else:
-            filelist.sort()
+            # sort
+            filelist_int = [int(x) for x in filelist]
+            filelist = [str(x) for x in sorted(filelist_int)]
+
             if page is not None and page in filelist:
                 shown_page = page
             else:
