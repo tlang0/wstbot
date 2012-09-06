@@ -53,12 +53,16 @@ class News(object):
             # try to find title
             match = re.search(news[2], content)
             if match is None:
-                print("Could not find title!")
+                print("Could not find title! (match == None)")
                 return
             if match.groups() is None or match.groups()[0] is None:
                 print("Found match but no groups")
-                print("match:")
-                print(match)
+                try:
+                    print("match.groups(): " + str(match.groups()))
+                    print("match.group(0): " + str(match.group(0)))
+                    print("match.group(1): " + str(match.group(1)))
+                except IndexError:
+                    pass
                 return
 
             title = match.groups()[0]
