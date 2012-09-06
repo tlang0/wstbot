@@ -26,6 +26,7 @@ HELPMSG = 'Type !help to see a list of commands.'
 HELLOMSG = 'Hello, #CHANNEL! ' + HELPMSG
 WELCOMEMSG = 'Hello, #NICK!'
 FORTUNEMSG = "Your fortune for today is:\n#FORTUNE"
+NO_HELP_MSG = "There is no help message for this command!"
 
 def module_exists(module_name):
     try:
@@ -95,6 +96,10 @@ class WstBot(wirc.wIRC):
             objectclass = objectfile[0].upper() + objectfile[1:objectfile.rfind('.')]
             objectmodule = objectclass.lower()
 
+            # omit templates (abstract classes)
+            if objectmodule == "command" or objectmodule == "parser":
+                continue
+
             try:
                 self.log.info("Importing object '" + objectclass + "'...")
                 module = importlib.import_module("{0}.{1}".format(directory, objectmodule))
@@ -131,6 +136,8 @@ class WstBot(wirc.wIRC):
         self.formatted_msg(self.chan, msg, addcolor)
 
     def get_command_object(self, cmd):
+        if cmd.strip() == "":
+            return None
         for cmd_obj in self.commands:
             if cmd == cmd_obj.get_cmd():
                 return cmd_obj
@@ -157,7 +164,9 @@ class WstBot(wirc.wIRC):
             argstr = msg[msg.find(" ")+1:]
         # user command
         ucmd = firstword[1:]
-
+        # empty command?
+        if ucmd.strip() == "":
+            return
         
         # !help command
         if firstword == "!help":
@@ -165,7 +174,12 @@ class WstBot(wirc.wIRC):
             if " " in msg:
                 cmd_obj = self.get_command_object(msg.split()[1])
                 if cmd_obj:
-                    self.chanmsg(cmd_obj.get_help())
+                    help_msg = cmd_obj.get_help()
+                    if help_msg is not None and help_msg.strip() != "":
+                        self.chanmsg(help_msg)
+                    else:
+                        self.chanmsg(NO_HELP_MSG)
+                        
             # general help
             else:
                 cmds = ""

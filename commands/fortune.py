@@ -1,25 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import urllib2, re, os
+from command import Command
 
 FORTUNEDISABLED = "This category is currently disabled."
 
-class Fortune(object):
+class Fortune(Command):
     
     def __init__(self):
         self.silent = False
 
     def do(self, bot, argstr, nick):
-        """
-        Execute the command.
-
-        Arguments:
-        bot -- instance of WstBot
-        argstr -- argument string (for "!cmd a b c", argstr would be "a b c")
-        nick -- nickname of the person who sent the command
-
-        """
-
         if self.silent:
             return
         
@@ -103,9 +94,7 @@ class Fortune(object):
             return
 
     def get_cmd(self):
-        """ Return the raw command """
         return "fortune"
 
     def get_help(self):
-        """ Return help for this specific command """
         return "Get a random fortune or a schneier fact with '!fortune schneier'"

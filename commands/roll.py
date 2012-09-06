@@ -1,18 +1,9 @@
 import random
+from command import Command
 
-class Roll(object):
+class Roll(Command):
 
     def do(self, bot, argstr, nick):
-        """
-        Execute the command.
-
-        Arguments:
-        bot -- instance of WstBot
-        argstr -- argument string (for "!cmd a b c", argstr would be "a b c")
-        nick -- nickname of the person who sent the command
-
-        """
-
         maxroll = 100
             
         if argstr.strip() != "":
@@ -30,10 +21,8 @@ class Roll(object):
 
 
     def get_cmd(self):
-        """ Return the raw command """
         return "roll"
 
     def get_help(self):
-        """ Return help for this specific command """
         return "!roll [limit]\nGenerate a random integer in the interval [0,limit]. " \
             + "By default, limit is 100."

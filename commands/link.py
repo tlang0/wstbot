@@ -1,6 +1,7 @@
 import ConfigParser
+from command import Command
 
-class Link(object):
+class Link(Command):
 
     def do(self, bot, argstr, nick):
         parser = ConfigParser.SafeConfigParser()

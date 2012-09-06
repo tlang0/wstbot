@@ -46,7 +46,7 @@ class Image(object):
             return
         
         # prefix for URLs in general
-        match_prefix = "(https?://)(www\.)?"
+        prefix = "(https?://)(www\.)?"
         imgurmatch = re.search(".*(" + prefix + "imgur.com/(.*/)?((\d|\w)*)(/)?)", msg)
         match = re.search(".*(" + prefix + ".*(\.jpeg|\.jpg|\.png|\.gif))", msg)
         if imgurmatch:
