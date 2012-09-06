@@ -45,8 +45,10 @@ class Image(object):
         if not self.working or msg[-1] == "*":
             return
         
-        imgurmatch = re.search("((https?://)(www\.)?imgur.com/(.*/)?((\d|\w)*)(/)?)", msg)
-        match = re.search("((http://|www\.).*(\.jpeg|\.jpg|\.png|\.gif))", msg)
+        # prefix for URLs in general
+        match_prefix = "(https?://)(www\.)?"
+        imgurmatch = re.search(".*(" + prefix + "imgur.com/(.*/)?((\d|\w)*)(/)?)", msg)
+        match = re.search(".*(" + prefix + ".*(\.jpeg|\.jpg|\.png|\.gif))", msg)
         if imgurmatch:
             url = self.imgur(imgurmatch.groups()[0])
         elif match:
