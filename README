@@ -2,6 +2,6 @@ Wstbot is a bot for the IRC network with extensible features.
 It is written by wst, wstcode@gmail.com.
 
 Dependencies:
-- python 2.7
-- (optional) gdata library for youtube modules
-- (optional) cherrypy for features using the webserver
+- python 2.7+ (not python 3)
+- gdata library for youtube modules
+- cherrypy for features using the webserver
