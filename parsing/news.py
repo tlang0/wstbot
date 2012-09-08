@@ -8,7 +8,7 @@ from colors import C
 
 MESSAGE = C.BOLD + C.RED + "#TITLE" + C.NOFO
 MESSAGE_AUTHOR = MESSAGE + " :: " + C.GREEN + "#AUTHOR" + C.NOFO
-PREFIX = '(https?://)(www\.)?'
+URL_PREFIX = '(https?://)(www\.)?'
 
 class News(object):
 
@@ -21,21 +21,23 @@ class News(object):
             return
 
         # valid ?
-        if not (msg.startswith("http://") or msg.startswith("https://") or msg.startswith("www.")):
+        if not "http" in msg and not "www" in msg:
             return
 
         # load
         fp = open("REGEX", "r")
         self.news = json.load(fp)
         fp.close()
-
-        # cut after url
-        space = msg.find(" ")
-        if space != -1:
-            msg = msg[:space]
+        
+        url_match = re.search("((https?://)(www\.)?\S+)", msg)
+        msg_url = url_match.group(1)
 
         for news in self.news:
-            match = re.search(news[1], msg)
+            try:
+                match = re.search(news[1], msg_url)
+            except:
+                print("shitty regex: " + news[1])
+                continue
             if not match:
                 continue
             url = match.groups()[0]
@@ -46,6 +48,7 @@ class News(object):
                 site = urllib2.urlopen(url)
             except:
                 print("Error opening url!")
+                return
 
             # retrieve content
             content = site.read()
