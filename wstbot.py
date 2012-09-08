@@ -115,16 +115,10 @@ class WstBot(wirc.wIRC):
     def formatted_msg(self, chan, msg, addcolor=True):
         def sendline(line):
             if line != "": # ignore empty lines
-                try:
-                    line = line.decode("ascii", "ignore").encode("ascii")
-                except UnicodeDecodeError:
-                    print("encoding problems!")
-                    traceback.print_exc()
+                if addcolor:
+                    self.msg(chan, C.NORMAL + line)
                 else:
-                    if addcolor:
-                        self.msg(chan, str(C.NORMAL + line))
-                    else:
-                        self.msg(chan, str(line))
+                    self.msg(chan, line)
 
                 
         if msg:
