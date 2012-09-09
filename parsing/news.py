@@ -21,7 +21,7 @@ class News(object):
             return
 
         # valid ?
-        if not "http" in msg and not "www" in msg:
+        if not "http://" in msg and not "www" in msg:
             return
 
         # load
@@ -29,8 +29,12 @@ class News(object):
         self.news = json.load(fp)
         fp.close()
         
-        url_match = re.search("((https?://)(www\.)?\S+)", msg)
-        msg_url = url_match.group(1)
+        try:
+            url_match = re.search("((https?://)(www\.)?\S+)", msg)
+            msg_url = url_match.group(1)
+        except:
+            print("no link found")
+            return
 
         for news in self.news:
             try:
