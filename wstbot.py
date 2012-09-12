@@ -139,15 +139,16 @@ class WstBot(wirc.wIRC):
 
     # Handle privmsg
     def on_privmsg(self, nick, ident, server, target, msg):    
-        # don't accept whispers and very short commands
-        if target != self.chan or len(msg) <= 2:
-            return
-
+        # parsing. accept direct messages too
         if msg[0] != "!":
             # check for keywords
             for cmd_obj in self.keywords:
                 self.chanmsg(cmd_obj.parse(self, msg, nick))
 
+            return
+
+        # don't accept whispered and very short commands
+        if target != self.chan or len(msg) <= 2:
             return
 
         firstword = msg
