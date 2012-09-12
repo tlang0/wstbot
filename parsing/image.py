@@ -3,6 +3,7 @@
 import os
 import re
 import urllib.request
+from util import str_list_to_int
 
 WEB_ENCODING = "utf-8"
 
@@ -18,7 +19,7 @@ class Image:
 
         self.working = True
         filelist = os.listdir(self.SERVER_IMAGES_PATH) 
-        filelist_int = self.make_int_list(filelist)
+        filelist_int = str_list_to_int(filelist)
         filelist = [str(x) for x in sorted(filelist_int)]
         if len(filelist) <= 0:
             new_file_name = "1"
@@ -28,19 +29,7 @@ class Image:
         print("New image file: {0}".format(new_file_name))
         self.filepath = os.path.join(self.SERVER_IMAGES_PATH, new_file_name)
         self.num_imagelinks = 0
-
-    def make_int_list(self, l):
-        new_list = []
-        for e in l:
-            try:
-                e = int(e)
-            except:
-                continue
-            else:
-                new_list.append(e)
-
-        return new_list
-
+    
     def imgur(self, url):
         print("imgur link")
         content = urllib.request.urlopen(url).read().decode(WEB_ENCODING)

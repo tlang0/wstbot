@@ -15,8 +15,8 @@ class Link(Command):
         argstr = argstr.strip()
         if argstr == "images":
             return server_url + "/images"
-        elif argstr == "news":
-            return server_url + "/news"
+        elif argstr == "regex" or argstr == "news":
+            return server_url + "/regex"
         else:
             return server_url + self.DEFAULT
     

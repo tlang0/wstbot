@@ -4,3 +4,9 @@ It is written by wst, wstcode@gmail.com.
 Dependencies:
 - python 3.1+
 - cherrypy for features using the webserver
+
+To run the bot and the server, enter the wstbot directory and type:
+
+python3 -m botserver.server
+
+python3 -m wstbot

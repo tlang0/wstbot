@@ -1,4 +1,4 @@
-import cherryserver
+from botserver import cherryserver
 
 class Server(object):
 
