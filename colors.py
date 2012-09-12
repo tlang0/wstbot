@@ -19,7 +19,7 @@
 #~ 14 grey
 #~ 15 light grey (silver)
 
-class C(object):
+class C:
     NOFO = chr(15) # not bold, not italic
     NORMAL = chr(3) + "14" # standard color for messages
 

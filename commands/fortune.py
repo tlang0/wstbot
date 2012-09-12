@@ -17,7 +17,7 @@ class Fortune(Command):
         message = ""
         
         while True:
-            print "Trying to get fortune message.."
+            bot.log.info("Trying to get fortune message..")
             
             if argstr.strip() != "":
                 message = self.fortune(argstr)

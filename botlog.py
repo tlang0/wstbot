@@ -1,15 +1,18 @@
 import os
 
-class Logger(object):
+class Logger:
     """Simple logging class"""
 
     def __init__(self, *outputs):
         self.outputs = None
+        self.prefix = ""
+        self.enabled = True
         if outputs is not None and len(outputs) > 0:
             self.outputs = outputs
 
     def add_output(self, output):
         if output is not None:
+            # check for write method
             try:
                 output.write
                 self.outputs.append(output)
@@ -17,8 +20,11 @@ class Logger(object):
                 print("Output handler has no write method!")
 
     def write(self, message):
+        if not self.enabled:
+            return
+
         for output in self.outputs:
-            output.write(message)
+            output.write(self.prefix + " " + message)
 
     def info(self, message):
         self.write(message)
@@ -34,6 +40,9 @@ class Logger(object):
 
     def send(self, message):
         self.write("-> " + message)
+
+    def debug(self, message):
+        self.write("DEBUG: " + message)
 
     def close(self):
         for output in self.outputs:

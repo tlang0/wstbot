@@ -1,11 +1,11 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import wirc
 import os
 import importlib
 import botlog
-import ConfigParser
+import configparser
 import thread
 from colors import C
 
@@ -36,10 +36,10 @@ def module_exists(module_name):
     else:
         return True
 
-class WstBotLoader(object):
+class WstBotLoader:
 
     def load(self, debug=False):
-        parser = ConfigParser.SafeConfigParser()
+        parser = configparser.SafeConfigParser()
         parser.read("wstbot.conf")
 
         server = parser.get("connection_data", "server")
@@ -62,6 +62,7 @@ class WstBot(wirc.wIRC):
 
         # initialize logger
         self.log = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
+        self.log.prefix = "WSTBOT"
         self.chan = channel
         self.commands = self.objects_from_files(COMMANDS_DIR)
         self.keywords = self.objects_from_files(PARSING_DIR)

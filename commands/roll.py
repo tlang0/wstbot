@@ -10,14 +10,14 @@ class Roll(Command):
             try:
                 maxroll = int(argstr.strip())
             except:
-                print "rolling: given argument is not an integer"
+                bot.log.warn("rolling: given argument is not an integer")
                
         if maxroll > 0:
             try:
                 roll = random.choice(range(maxroll))
                 bot.chanmsg(nick + ' rolls ' + str(roll) + ' (0-' + str(maxroll) + ')')
             except:
-                print "roll error"
+                bot.log.error("roll error!")
 
 
     def get_cmd(self):

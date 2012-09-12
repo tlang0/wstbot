@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import socket, re
+import socket
+import re
+import botlog
 
-class wIRC(object):
+FILE_LOG = "wirc.log"
+
+class wIRC:
+    """IRC client with minimal features"""
 
     def __init__(self, server, nick, port=6667, ident='wIRC', realname='wIRC bot', debug=False):
         self.server = server
@@ -11,8 +16,21 @@ class wIRC(object):
         self.ident = ident
         self.realname = realname
         self.debug = debug
+        self.log = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
+        self.log.prefix = "WIRC"
+        if not debug:
+            self.log.enabled = False
         
         self.connected = False
+
+    @property
+    def debug(self):
+        return self.debug
+
+    @debug.setter
+    def debug(self, value):
+        self.debug = value
+        self.log.enabled = value
         
     def connect(self):
         """Connect to server"""
@@ -24,9 +42,9 @@ class wIRC(object):
         try:
             self.sock = socket.socket()
             self.sock.connect((self.server, self.port))
-            self.dbg_info("Connected to %s:%s!" % (self.server, self.port))
+            self.log.info("Connected to {}:{}!".format(self.server, self.port))
         except:
-            self.dbg_error("Could not connect to %s!" % self.server)
+            self.log.error("Could not connect to {}!".format(self.server))
             return
             
         self.connected = True
@@ -46,7 +64,7 @@ class wIRC(object):
 
         for line in lines:
             if self.debug:
-                self.dbg_incoming(line)
+                self.log.recv(line)
             
             self.on_receive(line)
                 
@@ -54,24 +72,21 @@ class wIRC(object):
             words=line.split(" ")
 
             if words[0] == "PING":
-                self.send("PONG %s\n" % words[1])
+                self.send("PONG {0}\n".format(words[1]))
             elif len(words) > 1 and words[1] == "JOIN":
                 nick, ident, server, channel = re.match(":(.*)!(.*)@(.*) JOIN (.*)", line).groups()
-                print nick, ident, server, channel
+                self.log.debug(nick, ident, server, channel)
                 if nick == self.nick:
                     self.on_me_join(channel)
                 else:
                     self.on_join(nick, ident, server)
             elif len(words) > 1 and words[1] == "PRIVMSG":
-                try:
-                    privmsgdata = re.match(":(.*)!(.*)@(.*) PRIVMSG (#.*) :(.*)", line).groups()
-                    nick = privmsgdata[0]
-                    ident = privmsgdata[1]
-                    server = privmsgdata[2]
-                    target = privmsgdata[3]
-                    msg = privmsgdata[4]
-                except:
-                    print "Could not parse link!"
+                privmsgdata = re.match(":(.*)!(.*)@(.*) PRIVMSG (#.*) :(.*)", line).groups()
+                nick = privmsgdata[0]
+                ident = privmsgdata[1]
+                server = privmsgdata[2]
+                target = privmsgdata[3]
+                msg = privmsgdata[4]
                 
                 self.on_privmsg(nick, ident, server, target, msg)
                     
@@ -109,42 +124,14 @@ class wIRC(object):
             
     def send(self, data):
         self.sock.send(data)
-        self.dbg_outgoing(data)
+        self.log.send(data)
         
     def msg(self, target, data):
-        self.dbg_outgoing("Msg: (%s) %s" % (target, data))
-        self.sock.send("PRIVMSG %s :%s\n" % (target, data))
+        self.log.send("Msg: ({0}) {1}".format(target, data))
+        self.sock.send("PRIVMSG {0} :{1}\n".format(target, data))
             
     def send_nick(self):
         self.send("NICK " + self.nick + "\n")
         
     def send_user(self):
-        self.send("USER %s %s bla :%s\n" % (self.ident, self.server, self.realname))
-                
-    # debug output
-            
-    def dbg_info(self, debugstr):
-        if self.debug:
-            print "WIRC (*) " + debugstr
-            
-    def dbg_error(self, debugstr):
-        if self.debug:
-            print "WIRC [!] " + debugstr
-            
-    def dbg_incoming(self, debugstr):
-        if self.debug:
-            br = debugstr.find('\n')
-            if br != -1:
-                leftover = debugstr[br+1:len(debugstr)-1]
-                debugstr = debugstr[0:br]
-
-            if debugstr.strip():
-                print "WIRC <- " + debugstr;
-                
-            if br != -1:
-                self.dbg_incoming(leftover)
-            
-    def dbg_outgoing(self, debugstr):
-        if self.debug:
-            print "WIRC -> " + debugstr;
-        
+        self.send("USER {0} {1} awsm :{2}\n".format(self.ident, self.server, self.realname))

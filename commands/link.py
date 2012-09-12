@@ -1,4 +1,4 @@
-import ConfigParser
+import configparser
 from command import Command
 
 class Link(Command):
@@ -6,7 +6,7 @@ class Link(Command):
     DEFAULT = "/images"
 
     def do(self, bot, argstr, nick):
-        parser = ConfigParser.SafeConfigParser()
+        parser = configparser.SafeConfigParser()
         parser.read("wstbot.conf")
         address = parser.get("server_config", "address")
         port = parser.get("server_config", "port")

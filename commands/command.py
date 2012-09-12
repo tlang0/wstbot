@@ -1,4 +1,4 @@
-class Command(object):
+class Command:
     """A template for commands"""
 
     def __init__(self):
