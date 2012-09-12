@@ -7,7 +7,7 @@ ERROR_MESSAGE = "An error occured while retrieving information about the vimeo v
 VIDEO_MESSAGE = C.BOLD + C.VIOLET \
         + "#TITLE" + C.NOFO + C.BLACK + " :: " + C.GREEN + "#DURATION"
 
-class Vimeo(object):
+class Vimeo:
 
     def parse(self, bot, msg, nick):
         if msg[-1] == "*" or not "vimeo." in msg:

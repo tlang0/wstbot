@@ -4,7 +4,7 @@ import os
 import re
 import urllib2
 
-class Image(object):
+class Image:
 
     SERVER_IMAGES_PATH = os.path.join("botserver", "images")
     

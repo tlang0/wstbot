@@ -10,7 +10,7 @@ MESSAGE = C.BOLD + C.RED + "#TITLE" + C.NOFO
 MESSAGE_AUTHOR = MESSAGE + " :: " + C.GREEN + "#AUTHOR" + C.NOFO
 URL_PREFIX = '(https?://)(www\.)?'
 
-class News(object):
+class News:
 
     def __init__(self):
         self.news = json
