@@ -1,5 +1,5 @@
 import random
-from command import Command
+from commands.command import Command
 
 class Roll(Command):
 

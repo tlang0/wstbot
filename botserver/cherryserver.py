@@ -12,7 +12,7 @@ TEMPLATES_PATH = os.path.join(SERVER_PATH, "templates")
 
 # news constants
 REGEX_FILE = "REGEX"
-REGEX_BACKUP_DIR = "newsbackups"
+REGEX_BACKUP_DIR = "regexbackups"
 REGEX_BACKUP_PATH = os.path.join(SERVER_PATH, REGEX_BACKUP_DIR)
 
 class ImageListBuilder(object):

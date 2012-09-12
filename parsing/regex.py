@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import urllib2
+import urllib.request
 import re
-import HTMLParser
 import json
 from colors import C
 
 MESSAGE = C.BOLD + C.RED + "#TITLE" + C.NOFO
 MESSAGE_AUTHOR = MESSAGE + " :: " + C.GREEN + "#AUTHOR" + C.NOFO
 URL_PREFIX = '(https?://)(www\.)?'
+WEB_ENCODING = "utf-8"
 
-class News:
+class Regex:
 
     def __init__(self):
         self.news = json
@@ -49,13 +49,13 @@ class News:
             print("url: " + url)
         
             try:
-                site = urllib2.urlopen(url)
+                site = urllib.request.urlopen(url)
             except:
                 print("Error opening url!")
                 return
 
             # retrieve content
-            content = site.read()
+            content = site.read().decode(WEB_ENCODING)
 
             # try to find title
             match = re.search(news[2], content)
@@ -74,7 +74,6 @@ class News:
                 return
 
             title = match.groups()[0]
-            title = self.specialchars(title)
             print("found title: " + title)
 
             message = MESSAGE
@@ -91,20 +90,4 @@ class News:
             message = message.replace("#TITLE", title)
 
             return message
-
-
-    def specialchars(self, text):
-        #text = text.replace('&uuml;', 'ü')
-        #text = text.replace('&auml;', 'ä')
-        #text = text.replace('&ouml;', 'ö')
-        #text = text.replace('&#xFC;', 'ü')
-        #text = text.replace('&#xF6;', 'ö')
-        #text = text.replace('&#xE4;', 'ä')
-        parser = HTMLParser.HTMLParser()
-        decoded = text
-        try:
-            decoded = parser.unescape(text)
-        except:
-            print("could not unescape text")
-        return decoded
 

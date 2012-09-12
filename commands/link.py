@@ -1,5 +1,5 @@
 import configparser
-from command import Command
+from commands.command import Command
 
 class Link(Command):
 

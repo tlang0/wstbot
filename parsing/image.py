@@ -2,7 +2,9 @@
 
 import os
 import re
-import urllib2
+import urllib.request
+
+WEB_ENCODING = "utf-8"
 
 class Image:
 
@@ -16,20 +18,32 @@ class Image:
 
         self.working = True
         filelist = os.listdir(self.SERVER_IMAGES_PATH) 
-        filelist_int = [int(x) for x in filelist]
+        filelist_int = self.make_int_list(filelist)
         filelist = [str(x) for x in sorted(filelist_int)]
         if len(filelist) <= 0:
             new_file_name = "1"
         else:
             new_file_name = str(int(filelist[-1]) + 1)
 
-        print("New image file: " + str(new_file_name))
+        print("New image file: {0}".format(new_file_name))
         self.filepath = os.path.join(self.SERVER_IMAGES_PATH, new_file_name)
         self.num_imagelinks = 0
-    
+
+    def make_int_list(self, l):
+        new_list = []
+        for e in l:
+            try:
+                e = int(e)
+            except:
+                continue
+            else:
+                new_list.append(e)
+
+        return new_list
+
     def imgur(self, url):
         print("imgur link")
-        content = urllib2.urlopen(url).read()
+        content = urllib.request.urlopen(url).read().decode(WEB_ENCODING)
         match1 = re.search('<a href="(.*)" target="_blank">View full resolution', content)
         match2 = re.search('<link rel="image_src" href="(.*)"\s*/>', content)
         match = match1 or match2

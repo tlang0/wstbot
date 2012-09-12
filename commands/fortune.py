@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import urllib2, re, os
-from command import Command
+import re
+import os
+import urllib.request
+from commands.command import Command
 
+WEB_ENCODING = "utf-8"
 FORTUNEDISABLED = "This category is currently disabled."
 
 class Fortune(Command):
@@ -51,12 +54,11 @@ class Fortune(Command):
         
     # schneier facts
     def get_schneier(self):
-        site = urllib2.urlopen("http://www.schneierfacts.com/").read()
+        site = urllib.request.urlopen("http://www.schneierfacts.com/").read().decode(WEB_ENCODING)
         match = re.search(r'<p class="fact">(.*?)</p>', site, re.DOTALL)
         if match:
             fact = match.groups()[0]
             if fact:
-                print fact
                 fact = self.handle_html(fact)
                 return fact
         else:

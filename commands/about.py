@@ -1,5 +1,5 @@
 import socket
-from command import Command
+from commands.command import Command
 
 class About(Command):
 

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import re, urllib2, json
+import re
+import urllib.request
+import json
 from colors import C
 
 ERROR_MESSAGE = "An error occured while retrieving information about the vimeo video."
@@ -23,7 +25,7 @@ class Vimeo:
              
         url_video_data = "http://vimeo.com/api/v2/video/" + video_id + ".json"
         try:
-            content_json = urllib2.urlopen(url_video_data)
+            content_json = urllib.request.urlopen(url_video_data)
             content_json = content_json.read()
         except:
             print("an error occurred during urlopen!")

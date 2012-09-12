@@ -4,6 +4,7 @@ import socket
 import re
 import botlog
 
+ENCODING = "utf-8"
 FILE_LOG = "wirc.log"
 
 class wIRC:
@@ -15,21 +16,20 @@ class wIRC:
         self.port = port
         self.ident = ident
         self.realname = realname
-        self.debug = debug
+        self._debug = debug
         self.log = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
         self.log.prefix = "WIRC"
-        if not debug:
-            self.log.enabled = False
+        self.log.enabled = debug
         
         self.connected = False
 
     @property
     def debug(self):
-        return self.debug
+        return self._debug
 
     @debug.setter
     def debug(self, value):
-        self.debug = value
+        self._debug = value
         self.log.enabled = value
         
     def connect(self):
@@ -60,22 +60,23 @@ class wIRC:
             
     def doirc(self):
         rdata = self.sock.recv(1024)
-        lines = rdata.split("\n")
+        strdata = rdata.decode(ENCODING)
+        lines = strdata.split("\n")
 
         for line in lines:
+            line=line.rstrip()
+            if line == "":
+                continue
             if self.debug:
                 self.log.recv(line)
-            
             self.on_receive(line)
-                
-            line=line.rstrip()
-            words=line.split(" ")
 
+            words=line.split(" ")
+            
             if words[0] == "PING":
                 self.send("PONG {0}\n".format(words[1]))
             elif len(words) > 1 and words[1] == "JOIN":
                 nick, ident, server, channel = re.match(":(.*)!(.*)@(.*) JOIN (.*)", line).groups()
-                self.log.debug(nick, ident, server, channel)
                 if nick == self.nick:
                     self.on_me_join(channel)
                 else:
@@ -122,13 +123,13 @@ class wIRC:
         if self.connected:
             self.sock.close()
             
-    def send(self, data):
-        self.sock.send(data)
-        self.log.send(data)
+    def send(self, message):
+        self.sock.send(message.encode(ENCODING))
+        self.log.send(message)
         
-    def msg(self, target, data):
-        self.log.send("Msg: ({0}) {1}".format(target, data))
-        self.sock.send("PRIVMSG {0} :{1}\n".format(target, data))
+    def msg(self, target, message):
+        self.send("PRIVMSG {0} :{1}\n".format(target, message))
+        self.log.send("Msg: ({0}) {1}".format(target, message))
             
     def send_nick(self):
         self.send("NICK " + self.nick + "\n")

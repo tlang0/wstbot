@@ -7,6 +7,7 @@ import importlib
 import botlog
 import configparser
 from colors import C
+from util import apply_seq
 
 ##### DIRECTORIES / FILE PATHS #####
 
@@ -50,7 +51,7 @@ class WstBotLoader:
         channel = parser.get("connection_data", "channel")
         wstbot_server_port = int(parser.get("server_config", "port"))
 
-        return WstBot(server, nick, port, ident, realname, channel, server_port=wstbot_server_port, debug=True)
+        return WstBot(server, nick, port, ident, realname, channel, server_port=wstbot_server_port, debug=debug)
 
 class WstBot(wirc.wIRC):
 
@@ -95,8 +96,9 @@ class WstBot(wirc.wIRC):
                 class_ = getattr(module, objectclass)
                 obj = class_()
                 objects.append(obj)
-            except ImportError:
-                self.log.info("Importing '{0}' from '{1}' was unsuccessful!".format(objectclass, objectfile))
+            except ImportError as err:
+                self.log.warn("Importing '{0}' from '{1}' was unsuccessful!".format(objectclass, objectfile))
+                self.log.warn("Reason: {}".format(err))
 
         return objects
 
@@ -108,11 +110,10 @@ class WstBot(wirc.wIRC):
                     self.msg(chan, C.NORMAL + line)
                 else:
                     self.msg(chan, line)
-
                 
         if msg:
-            lines = msg.split('\n')
-            map(sendline, lines)
+            lines = msg.split("\n")
+            apply_seq(sendline, lines)
                     
     # Send a message to the current channel
     def chanmsg(self, msg, addcolor=True):
@@ -197,12 +198,10 @@ class WstBot(wirc.wIRC):
         if "End of" in line and "376" in line:
             self.join(self.chan)
 
-        #self.log.recv(line)
-
     def provide_special_options(self):
         print("Commands: msg, join")
         try:
-            command = raw_input()
+            command = input()
             sp = command.find(" ")
             c = command[:sp]
             argstr = command[sp + 1:]

@@ -1,4 +1,4 @@
-from command import Command
+from commands.command import Command
 
 class Youtubefrontend(Command):
 
@@ -16,8 +16,6 @@ class Youtubefrontend(Command):
             option = "viewCount"
 
         return "http://gdata.youtube.com/feeds/api/users/{0}/uploads?orderby={1}".format(user, option)
-
-        bot.chanmsg("http://lmgtfy.com/?q={0}".format(argstr.replace(" ", "+").strip()))
 
     def get_cmd(self):
         return "youtube"
