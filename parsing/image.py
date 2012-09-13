@@ -20,11 +20,10 @@ class Image:
         self.working = True
         filelist = os.listdir(self.SERVER_IMAGES_PATH) 
         filelist_int = str_list_to_int(filelist)
-        filelist = [str(x) for x in sorted(filelist_int)]
-        if len(filelist) <= 0:
+        if len(filelist_int) <= 0:
             new_file_name = "1"
         else:
-            new_file_name = str(int(filelist[-1]) + 1)
+            new_file_name = str(max(filelist_int) + 1)
 
         print("New image file: {0}".format(new_file_name))
         self.filepath = os.path.join(self.SERVER_IMAGES_PATH, new_file_name)
