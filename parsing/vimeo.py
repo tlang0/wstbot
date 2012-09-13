@@ -6,7 +6,7 @@ import json
 from colors import C
 
 ERROR_MESSAGE = "An error occured while retrieving information about the vimeo video."
-VIDEO_MESSAGE = C.BOLD + C.VIOLET \
+VIDEO_MESSAGE = C.BOLD + C.PURPLE \
         + "#TITLE" + C.NOFO + C.BLACK + " :: " + C.GREEN + "#DURATION"
 
 class Vimeo:

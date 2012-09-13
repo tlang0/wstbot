@@ -28,5 +28,9 @@ class C:
     GREEN = chr(3) + "03"
     RED = chr(3) + "04"
     #BROWN = chr(3) + "05"
-    VIOLET = chr(3) + "06"
+    PURPLE = chr(3) + "06"
     BOLD = chr(2)
+
+colors = {"default": C.NORMAL, "black": C.BLACK, "blue": C.BLUE, "green": C.GREEN, 
+        "red": C.RED, "purple": C.PURPLE}
+styles = {"default": C.NOFO, "bold": C.BOLD}

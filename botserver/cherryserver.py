@@ -14,7 +14,7 @@ SERVER_CONFIG_PATH = os.path.join(SERVER_PATH, "cherryserver.conf")
 TEMPLATES_PATH = os.path.join(SERVER_PATH, "templates")
 
 # regex constants
-REGEX_FILE = "REGEX"
+REGEX_FILE = "regex.yaml"
 REGEX_BACKUP_DIR = "regexbackups"
 REGEX_BACKUP_PATH = os.path.join(SERVER_PATH, REGEX_BACKUP_DIR)
 

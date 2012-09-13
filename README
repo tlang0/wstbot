@@ -4,9 +4,9 @@ It is written by wst, wstcode@gmail.com.
 Dependencies:
 - python 3.1+
 - cherrypy for features using the webserver
+- pyyaml
 
-To run the bot and the server, enter the wstbot directory and type:
+To run the bot and the server, enter the wstbot directory and execute:
 
 python3 -m botserver.server
-
 python3 -m wstbot

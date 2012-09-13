@@ -2,18 +2,14 @@
 
 import urllib.request
 import re
-import json
-from colors import C
+import yaml
+from colors import colors, styles
 
-MESSAGE = C.BOLD + C.RED + "#TITLE" + C.NOFO
-MESSAGE_AUTHOR = MESSAGE + " :: " + C.GREEN + "#AUTHOR" + C.NOFO
-URL_PREFIX = '(https?://)(www\.)?'
+#URL_PREFIX = '(https?://)(www\.)?'
 WEB_ENCODING = "utf-8"
+REGEX_FILE = "regex.yaml"
 
 class Regex:
-
-    def __init__(self):
-        self.news = json
 
     def parse(self, bot, msg, nick):
         # do not display
@@ -25,8 +21,8 @@ class Regex:
             return
 
         # load
-        fp = open("REGEX", "r")
-        self.news = json.load(fp)
+        fp = open(REGEX_FILE, "r")
+        self.regexdata = yaml.safe_load(fp)
         fp.close()
         
         try:
@@ -36,16 +32,16 @@ class Regex:
             print("no link found")
             return
 
-        for news in self.news:
+        for source in self.regexdata["sources"]:
             try:
-                match = re.search(news[1], msg_url)
+                match = re.search(source["url pattern"], msg_url)
             except:
-                print("shitty regex: " + news[1])
+                print("bad regex: " + source["url pattern"])
                 continue
             if not match:
                 continue
             url = match.groups()[0]
-            print("Found news from " + news[0] + "!")
+            print("Found news from " + source["name"] + "!")
             print("url: " + url)
         
             try:
@@ -57,37 +53,44 @@ class Regex:
             # retrieve content
             content = site.read().decode(WEB_ENCODING)
 
-            # try to find title
-            match = re.search(news[2], content)
-            if match is None:
-                print("Could not find title! (match == None)")
-                return
-            if match.groups() is None or match.groups()[0] is None:
-                print("Found match but no groups")
-                try:
-                    print("the pattern was: " + news[2])
-                    print("match.groups(): " + str(match.groups()))
-                    print("match.group(0): " + str(match.group(0)))
-                    print("match.group(1): " + str(match.group(1)))
-                except IndexError:
-                    pass
-                return
+            message = ""
 
-            title = match.groups()[0]
-            print("found title: " + title)
+            for info in source["patterns"]:
+                # try to find info
+                match = re.search(info["pattern"], content)
+                if match is None:
+                    print("Could not find info! (match == None)")
+                    return
+                if match.groups() is None or match.groups()[0] is None:
+                    print("Found match but no groups")
+                    try:
+                        print("the pattern was: " + info["pattern"])
+                        print("match.groups(): " + str(match.groups()))
+                        print("match.group(0): " + str(match.group(0)))
+                        print("match.group(1): " + str(match.group(1)))
+                    except IndexError:
+                        pass
+                    return
 
-            message = MESSAGE
+                infodata = match.groups()[0]
+                print("found info data: " + infodata)
 
-            # try to find author
-            if len(news) > 3:
-                match = re.search(news[3], content)
-                if not match:
-                    print("Author regex was specified but could not be found")
-                else:
-                    message = MESSAGE_AUTHOR
-                    message = message.replace("#AUTHOR", match.groups()[0])
-
-            message = message.replace("#TITLE", title)
-
+                if "replace" in info:
+                    infodata = self.do_replace(infodata, info["replace"])
+                    
+                message += styles[info["style"]] + colors[info["color"]] + infodata 
+                if info != source["patterns"][-1]:
+                    message += " " + styles["default"] + colors["default"] + self.regexdata["separator"] + " "
+                
             return message
+
+    def do_replace(self, message, replacements):
+        newmessage = message
+        for replacedata in replacements:
+            if not "needle" in replacedata or not "replacement" in replacedata:
+                print("replace: no needle or no replacement specified")
+            else:
+                newmessage = newmessage.replace(replacedata["needle"], replacedata["replacement"])
+
+        return newmessage
 
