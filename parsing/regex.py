@@ -3,6 +3,7 @@
 import urllib.request
 import re
 import yaml
+import html.parser
 from colors import colors, styles
 
 #URL_PREFIX = '(https?://)(www\.)?'
@@ -74,6 +75,7 @@ class Regex:
 
                 infodata = match.groups()[0]
                 print("found info data: " + infodata)
+                infodata = self.unescape(infodata)
 
                 if "replace" in info:
                     infodata = self.do_replace(infodata, info["replace"])
@@ -94,3 +96,6 @@ class Regex:
 
         return newmessage
 
+    def unescape(self, message):
+        parser = html.parser.HTMLParser()
+        return parser.unescape(message)
