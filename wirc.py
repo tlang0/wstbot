@@ -60,7 +60,9 @@ class wIRC:
             
     def doirc(self):
         rdata = self.sock.recv(1024)
-        strdata = rdata.decode(ENCODING)
+        strdata = self.chain_decode(rdata)
+        if strdata is None:
+            return
         lines = strdata.split("\n")
 
         for line in lines:
@@ -90,6 +92,28 @@ class wIRC:
                 msg = privmsgdata[4]
                 
                 self.on_privmsg(nick, ident, server, target, msg)
+
+    def chain_decode(self, data):
+        # try default encoding
+        try:
+            strdata = data.decode(ENCODING)
+            return strdata
+        except UnicodeDecodeError:
+            self.log.warn("decoding with default encoding failed")
+
+        # try latin
+        try:
+            strdata = data.decode("latin_1")
+            return strdata
+        except UnicodeDecodeError:
+            self.log.warn("decoding with latin encoding failed")
+
+        # do unicode with replacement
+        try:
+            strdata = data.decode("utf-8", "replace")
+            return strdata
+        except:
+            self.log.error("utf-8 decoding with replacement failed!")
                     
     def disconnect(self):
         self.sock.disconnect()
