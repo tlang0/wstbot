@@ -26,7 +26,7 @@ ENCODING = "utf-8"
 
 # regex constants
 REGEX_FILE = os.path.join("data", "regex.yaml")
-REGEX_BACKUP_DIR = "regexbackups"
+REGEX_BACKUP_DIR = os.path.join("backup", "regex")
 REGEX_BACKUP_PATH = os.path.join("botserver", REGEX_BACKUP_DIR)
 
 class RegexUpdater:
