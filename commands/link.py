@@ -22,7 +22,7 @@ from commands.command import Command
 
 class Link(Command):
 
-    DEFAULT = "/images"
+    DEFAULT = "/media"
 
     def do(self, bot, argstr, nick):
         parser = configparser.SafeConfigParser()
@@ -32,8 +32,8 @@ class Link(Command):
         server_url = address + ":" + port
 
         argstr = argstr.strip()
-        if argstr == "images":
-            return server_url + "/images"
+        if argstr == "media":
+            return server_url + "/media"
         elif argstr == "regex" or argstr == "news":
             return server_url + "/regex"
         else:
@@ -43,4 +43,4 @@ class Link(Command):
         return "link"
 
     def get_help(self):
-        return "Get the link to something on the server. Options: images, news. Default: " + self.DEFAULT
+        return "Get the link to something on the server. Options: media, news. Default: " + self.DEFAULT
