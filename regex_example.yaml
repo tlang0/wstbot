@@ -1,0 +1,36 @@
+separator: '::'
+sources:
+- name: slashdot.org
+  patterns:
+  - color: purple
+    description: title or headline
+    pattern: <title>(.*) - Slashdot
+    style: bold
+  url pattern: ((https?://)(www\.)?(.*\.)?slashdot\.org/.*)
+- name: imdb.com
+  patterns:
+  - color: purple
+    description: title or headline
+    pattern: <title>(.*) - IMDb
+    style: bold
+  - color: green
+    description: secondary information
+    pattern: <strong><span itemprop="ratingValue">(.*)</span></strong>
+    style: default
+  url pattern: ((https?://)(www\.)?imdb\.com/.*)
+- name: youtube.com
+  patterns:
+  - color: purple
+    description: title or headline
+    pattern: <meta property="og:title" content="(.+)">
+    style: bold
+  - color: green
+    description: secondary information
+    pattern: <meta itemprop="duration" content="PT(.+)">
+    style: default
+    replace:
+    - needle: "M"
+      replacement: "m "
+    - needle: "S"
+      replacement: "s"
+  url pattern: ((https?://)(www\.)?youtu(be\.com/watch|\.be/).+)
