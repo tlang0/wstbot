@@ -23,11 +23,12 @@ import urllib.request
 import re
 import yaml
 import html.parser
+import os
 from colors import colors, styles
 
 #URL_PREFIX = '(https?://)(www\.)?'
 WEB_ENCODING = "utf-8"
-REGEX_FILE = "regex.yaml"
+REGEX_FILE = os.path.join("data", "regex.yaml")
 
 class Regex:
 

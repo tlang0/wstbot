@@ -25,7 +25,7 @@ import shutil
 ENCODING = "utf-8"
 
 # regex constants
-REGEX_FILE = "regex.yaml"
+REGEX_FILE = os.path.join("data", "regex.yaml")
 REGEX_BACKUP_DIR = "regexbackups"
 REGEX_BACKUP_PATH = os.path.join("botserver", REGEX_BACKUP_DIR)
 

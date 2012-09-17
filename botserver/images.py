@@ -22,15 +22,14 @@ from util import str_list_to_int
 
 # places newer entries on top if true
 SHOW_DESCENDING = True
+IMAGES_PATH = os.path.join("data", "images")
 
 class ImageListBuilder:
     """Build a html image list from files containing the image URLs.
     In the html template, {{images}} will be replaced by the list"""
 
-    IMAGES_DIR = os.path.join("botserver", "images")
-
     def build(self, template, page=None):
-        filelist = os.listdir(self.IMAGES_DIR) 
+        filelist = os.listdir(IMAGES_PATH) 
         images_html = ""
 
         # no images
@@ -49,7 +48,7 @@ class ImageListBuilder:
 
             pos_in_list = filelist.index(shown_page)
 
-            path_list = os.path.join(self.IMAGES_DIR, shown_page)
+            path_list = os.path.join(IMAGES_PATH, shown_page)
             fp = open(path_list, "r")
             image_list = fp.readlines()
             image_iter = reversed(image_list) if SHOW_DESCENDING else iter(image_list)

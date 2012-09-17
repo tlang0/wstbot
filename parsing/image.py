@@ -25,19 +25,18 @@ import urllib.request
 from util import str_list_to_int
 
 WEB_ENCODING = "utf-8"
+SERVER_IMAGES_PATH = os.path.join("data", "images")
 
 class Image:
-
-    SERVER_IMAGES_PATH = os.path.join("botserver", "images")
     
     def __init__(self):
-        if not os.path.exists(self.SERVER_IMAGES_PATH):
-            print("Path does not exist: " + os.path.abspath(self.SERVER_IMAGES_PATH))
+        if not os.path.exists(SERVER_IMAGES_PATH):
+            print("Path does not exist: " + os.path.abspath(SERVER_IMAGES_PATH))
             self.working = False
             return
 
         self.working = True
-        filelist = os.listdir(self.SERVER_IMAGES_PATH) 
+        filelist = os.listdir(SERVER_IMAGES_PATH) 
         filelist_int = str_list_to_int(filelist)
         if len(filelist_int) <= 0:
             new_file_name = "1"
@@ -45,7 +44,7 @@ class Image:
             new_file_name = str(max(filelist_int) + 1)
 
         print("New image file: {0}".format(new_file_name))
-        self.filepath = os.path.join(self.SERVER_IMAGES_PATH, new_file_name)
+        self.filepath = os.path.join(SERVER_IMAGES_PATH, new_file_name)
         self.num_imagelinks = 0
     
     def imgur(self, url):
