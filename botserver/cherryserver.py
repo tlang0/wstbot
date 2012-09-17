@@ -22,12 +22,10 @@ import cherrypy
 import time
 import shutil
 from botserver.regex import RegexUpdater
-from botserver.images import ImageListBuilder
+from botserver.media import MediaListBuilder
 
 # server constants
 SERVER_CONFIG_PATH = os.path.join("botserver", "cherryserver.conf")
-
-# image constants
 TEMPLATES_PATH = os.path.join("botserver", "templates")
 
 class CherryServer:
@@ -35,9 +33,9 @@ class CherryServer:
     def index(self):
         return self.get_template("index.html")
         
-    def images(self, page=None):
-        builder = ImageListBuilder() 
-        return builder.build(self.get_template("images.html"), page)
+    def media(self, page=None):
+        builder = MediaListBuilder() 
+        return builder.build(self.get_template("media.html"), page)
 
     def regex(self, regex=None):
         updater = RegexUpdater()
@@ -60,7 +58,7 @@ class CherryServer:
             return "File not found: " + name
 
     index.exposed = True
-    images.exposed = True
+    media.exposed = True
     regex.exposed = True
     style.exposed = True
 
