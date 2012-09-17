@@ -48,12 +48,10 @@ class ImageListBuilder:
             template = template.replace("{navnext}", next_html)
 
             # insert images
-            i = 0
-            for url in image_iter:
+            for i, url in enumerate(image_iter):
                 if url[-1] == os.linesep:
                     url = url[:-1]
                 images_html += '<p><img src="{0}" alt="Some image" /></p>\n'.format(url)
-                i += 1
                 if i < len(image_list):
                   images_html += "<hr />\n"
 
