@@ -1,6 +1,9 @@
 import os
 from util import str_list_to_int
 
+# places newer entries on top if true
+SHOW_DESCENDING = True
+
 class ImageListBuilder:
     """Build a html image list from files containing the image URLs.
     In the html template, {{images}} will be replaced by the list"""
@@ -30,6 +33,7 @@ class ImageListBuilder:
             path_list = os.path.join(self.IMAGES_DIR, shown_page)
             fp = open(path_list, "r")
             image_list = fp.readlines()
+            image_iter = reversed(image_list) if SHOW_DESCENDING else iter(image_list)
 
             # insert links to previous and next page
             prev_html=""
@@ -45,7 +49,7 @@ class ImageListBuilder:
 
             # insert images
             i = 0
-            for url in image_list:
+            for url in image_iter:
                 if url[-1] == os.linesep:
                     url = url[:-1]
                 images_html += '<p><img src="{0}" alt="Some image" /></p>\n'.format(url)
