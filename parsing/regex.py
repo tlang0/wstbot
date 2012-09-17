@@ -52,16 +52,16 @@ class Regex:
                 return
 
             # retrieve content
-            content = site.read().decode(WEB_ENCODING)
+            content = site.read().decode(WEB_ENCODING, "replace")
 
-            message = ""
+            message = None
 
             for info in source["patterns"]:
                 # try to find info
                 match = re.search(info["pattern"], content)
                 if match is None:
                     print("Could not find info! (match == None)")
-                    return
+                    return message
                 if match.groups() is None or match.groups()[0] is None:
                     print("Found match but no groups")
                     try:
@@ -71,7 +71,7 @@ class Regex:
                         print("match.group(1): " + str(match.group(1)))
                     except IndexError:
                         pass
-                    return
+                    return message
 
                 infodata = match.groups()[0]
                 print("found info data: " + infodata)
@@ -79,7 +79,11 @@ class Regex:
 
                 if "replace" in info:
                     infodata = self.do_replace(infodata, info["replace"])
+
+                infodata = infodata.strip()
                     
+                if message is None:
+                    message = ""
                 message += styles[info["style"]] + colors[info["color"]] + infodata 
                 if info != source["patterns"][-1]:
                     message += " " + styles["default"] + colors["default"] + self.regexdata["separator"] + " "
