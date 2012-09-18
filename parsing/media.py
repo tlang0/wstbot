@@ -112,7 +112,7 @@ class Media:
         if not STORE_YOUTUBE:
             return None
 
-        match_youtube = re.search(URL_PREFIX + "youtube\.com/watch\?v=(\S+)", url)
+        match_youtube = re.search(URL_PREFIX + "youtube\.com/watch.*v=(\S{11})", url)
         match_youtube_short = re.search(URL_PREFIX + "youtu\.be/(\S+)", url)
         match = match_youtube or match_youtube_short
         if match is None:
