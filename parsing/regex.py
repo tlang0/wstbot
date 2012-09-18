@@ -32,7 +32,13 @@ REGEX_FILE = os.path.join("data", "regex.yaml")
 
 class Regex:
 
-    def parse(self, bot, msg, nick):
+    def __init__(self):
+        self.regexdata = None
+
+    def patterns_for_url(self, msg):
+        """Get the information dict from the yaml file for the url contained in msg.
+        Returns a tuple (url, resource_dict) where info is the yaml dict"""
+
         # do not display
         if msg[-1] == '*':
             return
@@ -53,62 +59,94 @@ class Regex:
             print("no link found")
             return
 
-        for source in self.regexdata["sources"]:
+        for resource_dict in self.regexdata["sources"]:
             try:
-                match = re.search(source["url pattern"], msg_url)
+                match = re.search(resource_dict["url pattern"], msg_url)
             except:
-                print("bad regex: " + source["url pattern"])
+                print("bad regex: " + resource_dict["url pattern"])
                 continue
             if not match:
                 continue
+
             url = match.groups()[0]
-            print("Found news from " + source["name"] + "!")
+            print("Found news from " + resource_dict["name"] + "!")
             print("url: " + url)
-        
-            try:
-                site = urllib.request.urlopen(url)
-            except:
-                print("Error opening url!")
-                return
 
-            # retrieve content
-            content = site.read().decode(WEB_ENCODING, "replace")
+            return (url, resource_dict)
 
-            message = None
+    def do_regex(self, url, resource_dict, name_and_title=False):
+        """Downloads the URL's content, searches for the regular expressions
+        and builds a message out of the matched data.
 
-            for info in source["patterns"]:
-                # try to find info
-                match = re.search(info["pattern"], content)
-                if match is None:
-                    print("Could not find info! (match == None)")
-                    return message
-                if match.groups() is None or match.groups()[0] is None:
-                    print("Found match but no groups")
-                    try:
-                        print("the pattern was: " + info["pattern"])
-                        print("match.groups(): " + str(match.groups()))
-                        print("match.group(0): " + str(match.group(0)))
-                        print("match.group(1): " + str(match.group(1)))
-                    except IndexError:
-                        pass
-                    return message
+        Arguments: resource_dict contains the patterns and additional data for
+        the url.
 
-                infodata = match.groups()[0]
-                print("found info data: " + infodata)
-                infodata = self.unescape(infodata)
+        If name_and_title is set, only the name and the result of the first
+        pattern match (wich is usually the title of the article) will be 
+        returned: (name, title)
+        """
 
-                if "replace" in info:
-                    infodata = self.do_replace(infodata, info["replace"])
+        if self.regexdata is None:
+            return
 
-                infodata = infodata.strip()
-                    
-                if message is None:
-                    message = ""
-                message += styles[info["style"]] + colors[info["color"]] + infodata 
-                if info != source["patterns"][-1]:
-                    message += " " + styles["default"] + colors["default"] + self.regexdata["separator"] + " "
+        try:
+            site = urllib.request.urlopen(url)
+        except:
+            print("Error opening url!")
+            return
+
+        # retrieve content
+        content = site.read().decode(WEB_ENCODING, "replace")
+
+        message = None
+
+        for info in resource_dict["patterns"]:
+            # try to find info
+            match = re.search(info["pattern"], content)
+            if match is None:
+                print("Could not find info! (match == None)")
+                break
+            if match.groups() is None or match.groups()[0] is None:
+                print("Found match but no groups")
+                try:
+                    print("the pattern was: " + info["pattern"])
+                    print("match.groups(): " + str(match.groups()))
+                    print("match.group(0): " + str(match.group(0)))
+                    print("match.group(1): " + str(match.group(1)))
+                except IndexError:
+                    pass
+                break
+
+            infodata = match.groups()[0]
+            print("found info data: " + infodata)
+            infodata = self.unescape(infodata)
+
+            # name and title
+            if name_and_title:
+                return (resource_dict["name"], infodata)
+
+            if "replace" in info:
+                infodata = self.do_replace(infodata, info["replace"])
+
+            infodata = infodata.strip()
                 
-            return message
+            if message is None:
+                message = ""
+            message += styles[info["style"]] + colors[info["color"]] + infodata 
+            if info != resource_dict["patterns"][-1]:
+                message += " " + styles["default"] + colors["default"] + self.regexdata["separator"] + " "
+
+        # cut last separator if there is one
+        sep = self.regexdata["separator"]
+        if message is not None and message.strip()[-len(sep):] == sep:
+            message = message.strip()[:-len(sep)].strip()
+            
+        return message
+            
+    def parse(self, bot, msg, nick):
+        url, resource_dict = self.patterns_for_url(msg)
+        message = self.do_regex(url, resource_dict)
+        return message
 
     def do_replace(self, message, replacements):
         newmessage = message

@@ -65,18 +65,23 @@ class Media:
             return
 
         url = match_link.group(1)
-        media_info = self.chain_parse(url, [self.parse_image, self.parse_youtube])
-        # nothing special found
+        media_info = self.chain_parse(url, [self.parse_image, self.parse_youtube, self.parse_link])
+        # something went wrong
         if media_info is None:
-            if not STORE_LINKS:
-                return
-            media_info = ("link", url)
+            print("something went wrong.")
+            return 
 
         # write
         fp = open(self.filepath, "a")
         json.dump(media_info, fp)
         fp.write(os.linesep)
         fp.close()
+
+    def parse_link(self, url):
+        if not STORE_LINKS:
+            return None
+
+        return ("link", url)
 
     def parse_image(self, url):
         if not STORE_IMAGES:
