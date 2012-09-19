@@ -25,9 +25,9 @@ import shutil
 ENCODING = "utf-8"
 
 # regex constants
-REGEX_FILE = os.path.join("data", "regex.yaml")
-REGEX_BACKUP_DIR = os.path.join("backup", "regex")
-REGEX_BACKUP_PATH = os.path.join("botserver", REGEX_BACKUP_DIR)
+REGEX_FILE_NAME = "regex.yaml"
+REGEX_FILE_PATH = os.path.join("data", REGEX_FILE_NAME)
+REGEX_BACKUP_PATH = os.path.join("backup", "regex")
 
 class RegexUpdater:
     """Updates the regex info for regex retrieval"""
@@ -38,27 +38,23 @@ class RegexUpdater:
         if regexdata is None:
             print("New regex data was None!")
 
-        if not os.path.exists(REGEX_FILE):
+        if not os.path.exists(REGEX_FILE_PATH):
             print("No previous regex data!")
         else:
-            # backup old regex file
-            if not os.path.exists(REGEX_BACKUP_PATH):
-                os.mkdir(REGEX_BACKUP_PATH)
-
-            shutil.copyfile(REGEX_FILE, os.path.join(REGEX_BACKUP_PATH, REGEX_FILE + str(time.time())))
+            shutil.copyfile(REGEX_FILE_PATH, os.path.join(REGEX_BACKUP_PATH, REGEX_FILE_NAME + str(time.time())))
 
         # write new regex
-        fp = open(REGEX_FILE, "wb")
+        fp = open(REGEX_FILE_PATH, "wb")
         fp.write(regexdata.encode("utf-8"))
         fp.close()
 
         return "New regex file was written."
 
     def make_page(self, template):
-        if not os.path.exists(REGEX_FILE):
+        if not os.path.exists(REGEX_FILE_PATH):
             return template.replace(self.NEEDLE, "")
         else:
-            fp = open(REGEX_FILE, "rb")
+            fp = open(REGEX_FILE_PATH, "rb")
             content = fp.read()
             fp.close()
             content = content.decode(ENCODING)

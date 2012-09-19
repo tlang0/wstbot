@@ -144,7 +144,10 @@ class Regex:
         return message
             
     def parse(self, bot, msg, nick):
-        url, resource_dict = self.patterns_for_url(msg)
+        r = self.patterns_for_url(msg)
+        if r is None:
+            return
+        url, resource_dict = r
         message = self.do_regex(url, resource_dict)
         return message
 
