@@ -70,12 +70,12 @@ class Logger:
             except NameError:
                 pass
 
-class Printer(object):
+class Printer:
 
     def write(self, message):
         print(message)
 
-class FileWriter(object):
+class FileWriter:
 
     def __init__(self, filename):
         self.fp = open(filename, "w")

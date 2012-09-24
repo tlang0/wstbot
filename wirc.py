@@ -36,9 +36,9 @@ class wIRC:
         self.ident = ident
         self.realname = realname
         self._debug = debug
-        self.log = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
-        self.log.prefix = "WIRC"
-        self.log.enabled = debug
+        self.irclog = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
+        self.irclog.prefix = "WIRC"
+        self.irclog.enabled = debug
         
         self.connected = False
 
@@ -49,7 +49,7 @@ class wIRC:
     @debug.setter
     def debug(self, value):
         self._debug = value
-        self.log.enabled = value
+        self.irclog.enabled = value
         
     def connect(self):
         """Connect to server"""
@@ -61,9 +61,9 @@ class wIRC:
         try:
             self.sock = socket.socket()
             self.sock.connect((self.server, self.port))
-            self.log.info("Connected to {}:{}!".format(self.server, self.port))
+            self.irclog.info("Connected to {}:{}!".format(self.server, self.port))
         except:
-            self.log.error("Could not connect to {}!".format(self.server))
+            self.irclog.error("Could not connect to {}!".format(self.server))
             return
             
         self.connected = True
@@ -73,7 +73,7 @@ class wIRC:
         self.on_connected()
             
     def run(self):
-        """This has to be called after connecting!"""
+        """This has to be called after connecting"""
         while True:
             self.doirc()
             
@@ -89,7 +89,7 @@ class wIRC:
             if line == "":
                 continue
             if self.debug:
-                self.log.recv(line)
+                self.irclog.recv(line)
             self.on_receive(line)
 
             words=line.split(" ")
@@ -118,21 +118,21 @@ class wIRC:
             strdata = data.decode(ENCODING)
             return strdata
         except UnicodeDecodeError:
-            self.log.warn("decoding with default encoding failed")
+            self.irclog.warn("decoding with default encoding failed")
 
         # try latin
         try:
             strdata = data.decode("latin_1")
             return strdata
         except UnicodeDecodeError:
-            self.log.warn("decoding with latin encoding failed")
+            self.irclog.warn("decoding with latin encoding failed")
 
         # do unicode with replacement
         try:
             strdata = data.decode("utf-8", "replace")
             return strdata
         except:
-            self.log.error("utf-8 decoding with replacement failed!")
+            self.irclog.error("utf-8 decoding with replacement failed!")
                     
     def disconnect(self):
         self.sock.disconnect()
@@ -168,11 +168,11 @@ class wIRC:
             
     def send(self, message):
         self.sock.send(message.encode(ENCODING))
-        self.log.send(message)
+        self.irclog.send(message)
         
     def msg(self, target, message):
         self.send("PRIVMSG {0} :{1}\n".format(target, message))
-        self.log.send("Msg: ({0}) {1}".format(target, message))
+        self.irclog.send("Msg: ({0}) {1}".format(target, message))
             
     def send_nick(self):
         self.send("NICK " + self.nick + "\n")
