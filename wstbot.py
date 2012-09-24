@@ -156,7 +156,7 @@ class WstBot(wirc.wIRC):
         if msg[0] != "!":
             # check for keywords
             for cmd_obj in self.keywords:
-                self.chanmsg(cmd_obj.do_parse(self, msg, nick))
+                self.chanmsg(cmd_obj.do_parse(msg, nick))
 
             return
 

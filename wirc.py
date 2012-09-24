@@ -103,7 +103,10 @@ class wIRC:
                 else:
                     self.on_join(nick, ident, server)
             elif len(words) > 1 and words[1] == "PRIVMSG":
-                privmsgdata = re.match(":(.*)!(.*)@(.*) PRIVMSG (#.*) :(.*)", line).groups()
+                match = re.match(":(.*)!(.*)@(.*) PRIVMSG (.*) :(.*)", line)
+                if match is None:
+                    self.irclog.warn("privmsg match was None!")
+                privmsgdata = match.groups()
                 nick = privmsgdata[0]
                 ident = privmsgdata[1]
                 server = privmsgdata[2]

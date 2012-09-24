@@ -25,7 +25,7 @@ class Parser:
         if bot is None or prefix is None:
             self.enabled = False
             return
-        self.disabled = True
+        self.enabled = True
         self.bot = bot
         self.log = self.bot.log.create_interface("PARSER " + prefix)
 
