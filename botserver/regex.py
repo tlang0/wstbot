@@ -27,7 +27,8 @@ ENCODING = "utf-8"
 # regex constants
 REGEX_FILE_NAME = "regex.yaml"
 REGEX_FILE_PATH = os.path.join("data", REGEX_FILE_NAME)
-REGEX_BACKUP_PATH = os.path.join("backup", "regex")
+BACKUP_DIRECTORY = "backup"
+REGEX_BACKUP_PATH = os.path.join(BACKUP_DIRECTORY, "regex")
 
 class RegexUpdater:
     """Updates the regex info for regex retrieval"""
@@ -38,10 +39,7 @@ class RegexUpdater:
         if regexdata is None:
             print("New regex data was None!")
 
-        if not os.path.exists(REGEX_FILE_PATH):
-            print("No previous regex data!")
-        else:
-            shutil.copyfile(REGEX_FILE_PATH, os.path.join(REGEX_BACKUP_PATH, REGEX_FILE_NAME + str(time.time())))
+        self.backup_regex()
 
         # write new regex
         fp = open(REGEX_FILE_PATH, "wb")
@@ -49,6 +47,21 @@ class RegexUpdater:
         fp.close()
 
         return "New regex file was written."
+
+    def backup_regex(self):
+        if not os.path.exists(REGEX_FILE_PATH):
+            print("No previous regex data, nothing to back up!")
+            return
+
+        # make a backup
+        try:
+            os.mkdir(BACKUP_DIRECTORY)
+        except os.error:
+            pass
+
+        shutil.copyfile(REGEX_FILE_PATH, os.path.join(REGEX_BACKUP_PATH, REGEX_FILE_NAME + str(time.time())))
+
+
 
     def make_page(self, template):
         if not os.path.exists(REGEX_FILE_PATH):
