@@ -4,4 +4,6 @@
 *~
 ~*
 __pycache__
+wstbot.conf
+*.log
 !.gitignore

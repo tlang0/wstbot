@@ -5,10 +5,10 @@ nick = wurstbrot_
 snick = wurstbrot__
 ident = WSTBOT
 realname = wIRC bot
-channel = #wstbottest
+channel = #hibforum
 
 [server_config]
 port = 8111
-address = something.org
+address = http://wst.hopto.org
 
 
