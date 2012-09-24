@@ -1,15 +1,29 @@
 Wstbot is a bot for the IRC network with extensible features.
 It is developed by wst, wstcode@gmail.com.
 
-Dependencies:
-- python 3.1+
-- cherrypy for features using the webserver
-- pyyaml
+========================
+Dependencies
+========================
+
+* python 3.1+
+* cherrypy for features using the webserver
+* pyyaml
+
+========================
+Installation
+========================
+
+* Edit wstbot.conf.EXAMPLE and rename it to wstbot.conf.
+* Rename data/regex.yaml.EXAMPLE to data/regex.yaml (and add some sites if you want to).
 
 To run the bot and the server, enter the wstbot directory and execute:
 
 python3 -m botserver.server
 python3 -m wstbot
+
+========================
+License
+========================
 
 Wstbot is licensed unter the GPLv3, which can be found in the COPYING 
 file.
