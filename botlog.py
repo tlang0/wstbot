@@ -29,8 +29,8 @@ class Logger:
         if outputs is not None and len(outputs) > 0:
             self.outputs = outputs
 
-    def create_interface(self, prefix):
-        return LoggingInterface(self, prefix)
+    def create_default_interface(self, prefix):
+        return DefaultLoggingInterface(self, prefix)
 
     def add_output(self, output):
         """Add a new output handler"""
@@ -51,6 +51,24 @@ class Logger:
         for output in self.outputs:
             output.write(prefix + " " + message)
 
+    def close(self):
+        for output in self.outputs:
+            try:
+                output.close()
+            except AttributeError:
+                pass
+
+class DefaultLoggingInterface:
+    """Gives access to a logger object using a specified prefix"""
+    
+    def __init__(self, logger, prefix):
+        self.logger = logger
+        self.prefix = prefix
+        self.close = logger.close
+                
+    def write(self, message):
+        self.logger.write(message, self.prefix)
+
     def info(self, message):
         self.write(message)
 
@@ -68,23 +86,6 @@ class Logger:
 
     def debug(self, message):
         self.write("DEBUG: " + message)
-
-    def close(self):
-        for output in self.outputs:
-            try:
-                output.close()
-            except AttributeError:
-                pass
-
-class LoggingInterface:
-    """Use a logger with a different prefix"""
-    
-    def __init__(self, logger, prefix):
-        self.logger = logger
-        self.prefix = prefix
-
-    def write(self, message):
-        self.logger.write(message)
 
 class Printer:
 

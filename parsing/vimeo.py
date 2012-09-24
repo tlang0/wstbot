@@ -44,14 +44,14 @@ class Vimeo(Parser):
             return
 
         video_id = match.groups()[0]
-        print("found vimeo video id: " + video_id)
+        self.log.info("found vimeo video id: " + video_id)
              
         url_video_data = "http://vimeo.com/api/v2/video/" + video_id + ".json"
         try:
             content_json = urllib.request.urlopen(url_video_data)
             content_json = content_json.read()
         except:
-            print("an error occurred during urlopen!")
+            self.log.warn("an error occurred during urlopen!")
 
         content = json.loads(content_json)
         content = content[0]

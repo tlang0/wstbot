@@ -80,8 +80,9 @@ class WstBot(wirc.wIRC):
         self.silent = False
 
         # initialize logger
-        self.log = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
-        self.log.default_prefix = "WSTBOT"
+        self.logger = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
+        self.logger.enabled = debug
+        self.log = self.logger.create_default_interface("WSTBOT")
         self.chan = channel
         self.commands = self.objects_from_files(COMMANDS_DIR)
         self.keywords = self.objects_from_files(PARSING_DIR)

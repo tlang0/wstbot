@@ -17,6 +17,8 @@
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
+import botlog
+
 class Parser:
     """Base class for parsers"""
 
@@ -27,7 +29,7 @@ class Parser:
             return
         self.enabled = True
         self.bot = bot
-        self.log = self.bot.log.create_interface("PARSER " + prefix)
+        self.log = self.bot.logger.create_default_interface("PARSER " + prefix)
 
     def do_parse(self, msg, nick):
         """

@@ -36,9 +36,11 @@ class wIRC:
         self.ident = ident
         self.realname = realname
         self._debug = debug
-        self.irclog = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
-        self.irclog.default_prefix = "WIRC"
-        self.irclog.enabled = debug
+
+        # init logger
+        self.irclogger = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
+        self.irclogger.enabled = debug
+        self.irclog = self.irclogger.create_default_interface("WIRC")
         
         self.connected = False
 

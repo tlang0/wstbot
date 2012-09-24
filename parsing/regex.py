@@ -58,21 +58,21 @@ class Regex(Parser):
             url_match = re.search("((https?://)(www\.)?\S+)", msg)
             msg_url = url_match.group(1)
         except:
-            print("no link found")
+            self.log.warn("no link found")
             return
 
         for resource_dict in self.regexdata["sources"]:
             try:
                 match = re.search(resource_dict["url pattern"], msg_url)
             except:
-                print("bad regex: " + resource_dict["url pattern"])
+                self.log.warn("bad regex: " + resource_dict["url pattern"])
                 continue
             if not match:
                 continue
 
             url = match.groups()[0]
-            print("Found news from " + resource_dict["name"] + "!")
-            print("url: " + url)
+            self.log.info("Found information from " + resource_dict["name"] + "!")
+            self.log.info("url: " + url)
 
             return (url, resource_dict)
 
@@ -94,7 +94,7 @@ class Regex(Parser):
         try:
             site = urllib.request.urlopen(url)
         except:
-            print("Error opening url!")
+            self.log.warn("Error opening url!")
             return
 
         # retrieve content
@@ -106,21 +106,21 @@ class Regex(Parser):
             # try to find info
             match = re.search(info["pattern"], content)
             if match is None:
-                print("Could not find info! (match == None)")
+                self.log.warn("Could not find info! (match == None)")
                 break
             if match.groups() is None or match.groups()[0] is None:
-                print("Found match but no groups")
+                self.log.warn("Found match but no groups")
                 try:
-                    print("the pattern was: " + info["pattern"])
-                    print("match.groups(): " + str(match.groups()))
-                    print("match.group(0): " + str(match.group(0)))
-                    print("match.group(1): " + str(match.group(1)))
+                    self.log.warn("the pattern was: " + info["pattern"])
+                    self.log.warn("match.groups(): " + str(match.groups()))
+                    self.log.warn("match.group(0): " + str(match.group(0)))
+                    self.log.warn("match.group(1): " + str(match.group(1)))
                 except IndexError:
                     pass
                 break
 
             infodata = match.groups()[0]
-            print("found info data: " + infodata)
+            self.log.info("found info data: " + infodata)
             infodata = self.unescape(infodata)
 
             # name and title
@@ -157,7 +157,7 @@ class Regex(Parser):
         newmessage = message
         for replacedata in replacements:
             if not "needle" in replacedata or not "replacement" in replacedata:
-                print("replace: no needle or no replacement specified")
+                self.log.warn("replace: no needle or no replacement specified")
             else:
                 newmessage = newmessage.replace(replacedata["needle"], replacedata["replacement"])
 

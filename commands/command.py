@@ -27,7 +27,7 @@ class Command:
             return
         self.enabled = True
         self.bot = bot
-        self.log = self.bot.log.create_interface("COMMAND " + prefix)
+        self.log = self.bot.logger.create_default_interface("COMMAND " + prefix)
 
     def do_cmd(self, argstr, nick):
         """
