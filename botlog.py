@@ -24,12 +24,16 @@ class Logger:
 
     def __init__(self, *outputs):
         self.outputs = None
-        self.prefix = ""
+        self.default_prefix = ""
         self.enabled = True
         if outputs is not None and len(outputs) > 0:
             self.outputs = outputs
 
+    def create_interface(self, prefix):
+        return LoggingInterface(self, prefix)
+
     def add_output(self, output):
+        """Add a new output handler"""
         if output is not None:
             # check for write method
             try:
@@ -38,12 +42,14 @@ class Logger:
             except NameError:
                 print("Output handler has no write method!")
 
-    def write(self, message):
+    def write(self, message, prefix=None):
         if not self.enabled:
             return
+        if prefix is None:
+            prefix = self.default_prefix
 
         for output in self.outputs:
-            output.write(self.prefix + " " + message)
+            output.write(prefix + " " + message)
 
     def info(self, message):
         self.write(message)
@@ -67,8 +73,18 @@ class Logger:
         for output in self.outputs:
             try:
                 output.close()
-            except NameError:
+            except AttributeError:
                 pass
+
+class LoggingInterface:
+    """Use a logger with a different prefix"""
+    
+    def __init__(self, logger, prefix):
+        self.logger = logger
+        self.prefix = prefix
+
+    def write(self, message):
+        self.logger.write(message)
 
 class Printer:
 
@@ -83,5 +99,5 @@ class FileWriter:
     def write(self, message):
         self.fp.write(message + os.linesep)
 
-    def close(self, message):
+    def close(self):
         self.fp.close()

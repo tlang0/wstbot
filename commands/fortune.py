@@ -29,7 +29,8 @@ FORTUNEDISABLED = "This category is currently disabled."
 
 class Fortune(Command):
     
-    def __init__(self):
+    def __init__(self, bot):
+        super().__init__(bot, "FORTUNE")
         self.silent = False
 
     def do(self, bot, argstr, nick):

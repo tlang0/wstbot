@@ -37,7 +37,7 @@ class wIRC:
         self.realname = realname
         self._debug = debug
         self.irclog = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
-        self.irclog.prefix = "WIRC"
+        self.irclog.default_prefix = "WIRC"
         self.irclog.enabled = debug
         
         self.connected = False
@@ -139,6 +139,7 @@ class wIRC:
         
     def quit(self):
         self.disconnect()
+        self.irclog.close()
 
     def on_join(self, nick, ident, server):
         pass

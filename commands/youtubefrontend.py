@@ -21,7 +21,10 @@ from commands.command import Command
 
 class Youtubefrontend(Command):
 
-    def do(self, bot, argstr, nick):
+    def __init__(self, bot):
+        super().__init__(bot, "YOUTUBEFRONTEND")
+
+    def do(self, argstr, nick):
         argstr = argstr.strip()
 
         if not " " in argstr:

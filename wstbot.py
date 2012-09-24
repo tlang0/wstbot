@@ -81,7 +81,7 @@ class WstBot(wirc.wIRC):
 
         # initialize logger
         self.log = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
-        self.log.prefix = "WSTBOT"
+        self.log.default_prefix = "WSTBOT"
         self.chan = channel
         self.commands = self.objects_from_files(COMMANDS_DIR)
         self.keywords = self.objects_from_files(PARSING_DIR)
@@ -113,7 +113,7 @@ class WstBot(wirc.wIRC):
                 self.log.info("Importing object '" + objectclass + "'...")
                 module = importlib.import_module("{0}.{1}".format(directory, objectmodule))
                 class_ = getattr(module, objectclass)
-                obj = class_()
+                obj = class_(self)
                 objects.append(obj)
             except ImportError as err:
                 self.log.warn("Importing '{0}' from '{1}' was unsuccessful!".format(objectclass, objectfile))
@@ -149,10 +149,14 @@ class WstBot(wirc.wIRC):
     # Handle privmsg
     def on_privmsg(self, nick, ident, server, target, msg):    
         # parsing. accept direct messages too
+        if msg is None:
+            self.log.warn("on_privmsg: msg was None")
+        if msg == "":
+            self.log.warn("on_privmsg: msg was empty")
         if msg[0] != "!":
             # check for keywords
             for cmd_obj in self.keywords:
-                self.chanmsg(cmd_obj.parse(self, msg, nick))
+                self.chanmsg(cmd_obj.do_parse(self, msg, nick))
 
             return
 
@@ -195,7 +199,7 @@ class WstBot(wirc.wIRC):
             # check for command
             cmd_obj = self.get_command_object(ucmd)
             if cmd_obj:
-                self.chanmsg(cmd_obj.do(self, argstr, nick))
+                self.chanmsg(cmd_obj.do_cmd(argstr, nick))
 
     # Joining a channel
     def on_me_join(self, channel):
@@ -207,7 +211,7 @@ class WstBot(wirc.wIRC):
         welcome_msg = WELCOMEMSG.replace("#NICK", nick)
         fortune_cmd_obj = self.get_command_object("fortune")
         if fortune_cmd_obj:
-            fortune = fortune_cmd_obj.do(self, "", nick)
+            fortune = fortune_cmd_obj.do_cmd("", nick)
             welcome_msg += " " + FORTUNEMSG.replace("#FORTUNE", fortune)
         self.chanmsg(welcome_msg)
         
@@ -245,4 +249,6 @@ if __name__ == '__main__':
             o = wstbot.provide_special_options()
             if o == -1:
                 wstbot.log.info("bye!")
+                wstbot.log.close()
+                wstbot.quit()
                 break

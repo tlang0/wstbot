@@ -24,6 +24,7 @@ import re
 import json
 import urllib.request
 from util import str_list_to_int
+from parsing.parser import Parser
 
 # what kinds of links should be stored?
 STORE_IMAGES = True
@@ -35,10 +36,12 @@ MEDIA_PATH = os.path.join("data", "media")
 
 URL_PREFIX = "(?:https?://)(?:www\.)?"
 
-class Media:
+class Media(Parser):
     """Parse for URLs that could be of interest and store them"""
     
-    def __init__(self):
+    def __init__(self, bot):
+        super().__init__(bot, "MEDIA")
+
         if not os.path.exists(MEDIA_PATH):
             print("Path does not exist: " + os.path.abspath(MEDIA_PATH))
             self.working = False
@@ -55,7 +58,7 @@ class Media:
         print("New media file: {0}".format(new_file_name))
         self.filepath = os.path.join(MEDIA_PATH, new_file_name)
         
-    def parse(self, bot, msg, nick):
+    def parse(self, msg, nick):
         if not self.working or msg[-1] == "*":
             return
 

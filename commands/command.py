@@ -18,26 +18,35 @@
 ########################################################################
 
 class Command:
-    """A template for commands"""
+    """Base class for commands"""
 
-    def __init__(self):
-        self.disabled = False
+    def __init__(self, bot, prefix):
+        """Initialize module"""
+        if bot is None or prefix is None:
+            self.enabled = False
+            return
+        self.disabled = True
+        self.bot = bot
+        self.log = self.bot.log.create_interface("COMMAND " + prefix)
 
-    def do(self, bot, argstr, nick):
+    def do_cmd(self, argstr, nick):
         """
         Execute the command.
 
         Arguments:
-        bot -- instance of WstBot
         argstr -- argument string (for "!cmd a b c", argstr would be "a b c")
         nick -- nickname of the person who sent the command
 
         The return string will be sent to the active channel.
-
         """
         
-        return ""
+        if self.enabled:
+            return self.do(argstr, nick)
         
+    def do(self, argstr, nick):
+        """Do something."""
+        return ""
+
     def get_cmd(self):
         """ Return the raw command """
         return ""

@@ -22,7 +22,10 @@ from commands.command import Command
 
 class Roll(Command):
 
-    def do(self, bot, argstr, nick):
+    def __init__(self, bot):
+        super().__init__(bot, "ROLL")
+
+    def do(self, argstr, nick):
         maxroll = 100
             
         if argstr.strip() != "":

@@ -25,14 +25,16 @@ import yaml
 import html.parser
 import os
 from colors import colors, styles
+from parsing.parser import Parser
 
 #URL_PREFIX = '(https?://)(www\.)?'
 WEB_ENCODING = "utf-8"
 REGEX_FILE = os.path.join("data", "regex.yaml")
 
-class Regex:
+class Regex(Parser):
 
-    def __init__(self):
+    def __init__(self, bot):
+        super().__init__(bot, "REGEX")
         self.regexdata = None
 
     def patterns_for_url(self, msg):
@@ -143,7 +145,7 @@ class Regex:
             
         return message
             
-    def parse(self, bot, msg, nick):
+    def parse(self, msg, nick):
         r = self.patterns_for_url(msg)
         if r is None:
             return

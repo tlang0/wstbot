@@ -17,22 +17,40 @@
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
-import socket
-from commands.command import Command
+class Parser:
+    """Base class for parsers"""
 
-class About(Command):
+    def __init__(self, bot, prefix):
+        """Initialize module"""
+        if bot is None or prefix is None:
+            self.enabled = False
+            return
+        self.disabled = True
+        self.bot = bot
+        self.log = self.bot.log.create_interface("PARSER " + prefix)
 
-    def __init__(self, bot):
-        super().__init__(bot, "ABOUT")
+    def do_parse(self, msg, nick):
+        """
+        Execute the command.
 
-    def do(self, argstr, nick):
-        try:
-            return "Running on " + socket.gethostname()
-        except:
-            return "An error occurred."
+        Arguments:
+        msg -- the full message
+        nick -- nickname of the person who sent the command
+
+        The return string will be sent to the active channel.
+        """
+        
+        if self.enabled:
+            return self.parse(msg, nick)
+        
+    def parse(self, msg, nick):
+        """Parse."""
+        return ""
 
     def get_cmd(self):
-        return "about"
+        """ Return the raw command """
+        return ""
 
     def get_help(self):
-        return "Information about the computer the bot is running on."
+        """ Return help for this specific command """
+        return ""
