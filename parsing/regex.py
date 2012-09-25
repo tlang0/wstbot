@@ -49,6 +49,8 @@ class Regex(Parser):
         if not "http://" in msg and not "www" in msg:
             return
 
+        self.logger.info("last message was a link!")
+
         # load
         fp = open(REGEX_FILE, "r")
         self.regexdata = yaml.safe_load(fp)
@@ -120,7 +122,7 @@ class Regex(Parser):
                 break
 
             infodata = match.groups()[0]
-            self.log.info("found info data: " + infodata)
+            self.logger.info("found info data: " + infodata)
             infodata = self.unescape(infodata)
 
             # name and title
