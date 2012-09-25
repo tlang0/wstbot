@@ -22,9 +22,12 @@
 import socket
 import re
 import botlog
+import logging
 
 ENCODING = "utf-8"
 FILE_LOG = "wirc.log"
+
+logger = logging.getLogger(__name__)
 
 class wIRC:
     """IRC client with minimal features"""
@@ -35,14 +38,13 @@ class wIRC:
         self.port = port
         self.ident = ident
         self.realname = realname
-        self._debug = debug
-
-        # init logger
-        self.irclogger = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
-        self.irclogger.enabled = debug
-        self.irclog = self.irclogger.create_default_interface("WIRC")
         
         self.connected = False
+
+        # init logger
+        self.debug = debug # sets self._debug
+        logger.addHandler(StreamHandler())
+        logger.addHandler(FileHandler(FILE_LOG))
 
     @property
     def debug(self):
@@ -51,7 +53,10 @@ class wIRC:
     @debug.setter
     def debug(self, value):
         self._debug = value
-        self.irclog.enabled = value
+        if self._debug:
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.INFO)
         
     def connect(self):
         """Connect to server"""
@@ -63,9 +68,9 @@ class wIRC:
         try:
             self.sock = socket.socket()
             self.sock.connect((self.server, self.port))
-            self.irclog.info("Connected to {}:{}!".format(self.server, self.port))
+            logger.info("Connected to {}:{}!".format(self.server, self.port))
         except:
-            self.irclog.error("Could not connect to {}!".format(self.server))
+            logger.error("Could not connect to {}!".format(self.server))
             return
             
         self.connected = True
@@ -90,8 +95,7 @@ class wIRC:
             line=line.rstrip()
             if line == "":
                 continue
-            if self.debug:
-                self.irclog.recv(line)
+            logger.debug("<- " + line)
             self.on_receive(line)
 
             words=line.split(" ")
@@ -107,7 +111,7 @@ class wIRC:
             elif len(words) > 1 and words[1] == "PRIVMSG":
                 match = re.match(":(.*)!(.*)@(.*) PRIVMSG (.*) :(.*)", line)
                 if match is None:
-                    self.irclog.warn("privmsg match was None!")
+                    logger.warning("privmsg match was None!")
                 privmsgdata = match.groups()
                 nick = privmsgdata[0]
                 ident = privmsgdata[1]
@@ -123,28 +127,27 @@ class wIRC:
             strdata = data.decode(ENCODING)
             return strdata
         except UnicodeDecodeError:
-            self.irclog.warn("decoding with default encoding failed")
+            logger.exception("decoding with default encoding failed")
 
         # try latin
         try:
             strdata = data.decode("latin_1")
             return strdata
         except UnicodeDecodeError:
-            self.irclog.warn("decoding with latin encoding failed")
+            logger.exception("decoding with latin encoding failed")
 
         # do unicode with replacement
         try:
             strdata = data.decode("utf-8", "replace")
             return strdata
         except:
-            self.irclog.error("utf-8 decoding with replacement failed!")
+            logger.error("utf-8 decoding with replacement failed!")
                     
     def disconnect(self):
         self.sock.disconnect()
         
     def quit(self):
         self.disconnect()
-        self.irclog.close()
 
     def on_join(self, nick, ident, server):
         pass
@@ -174,11 +177,11 @@ class wIRC:
             
     def send(self, message):
         self.sock.send(message.encode(ENCODING))
-        self.irclog.send(message)
+        logger.debug("-> " + message)
         
     def msg(self, target, message):
         self.send("PRIVMSG {0} :{1}\n".format(target, message))
-        self.irclog.send("Msg: ({0}) {1}".format(target, message))
+        logger.debug("Msg: ({0}) {1}".format(target, message))
             
     def send_nick(self):
         self.send("NICK " + self.nick + "\n")
