@@ -21,46 +21,32 @@ import os
 import cherrypy
 import time
 import shutil
-from botserver.regex import RegexUpdater
-from botserver.media import MediaListBuilder
-
-# server constants
-SERVER_CONFIG_PATH = os.path.join("botserver", "cherryserver.conf")
-TEMPLATES_PATH = os.path.join("botserver", "templates")
+import yaml
+import importlib
+from wstbot_locals import DESCRIPTION_PATH 
+from botserver.util import get_template_content
 
 class CherryServer:
 
     def index(self):
-        return self.get_template("index.html")
+        return get_template_content("index.html")
+
+    def load_modules(self):
+        """Dynamically load server modules using the description file"""
+        fp = open(DESCRIPTION_PATH, "r")
+        modules_data = yaml.safe_load(fp)
+        fp.close()
+
+        if "modules" not in modules_data:
+            print("modules in modules.yaml not found")
+            return
         
-    def media(self, page=None):
-        builder = MediaListBuilder() 
-        return builder.build(self.get_template("media.html"), page)
-
-    def regex(self, regex=None):
-        updater = RegexUpdater()
-        if regex is None:
-            return updater.make_page(self.get_template("regex.html"))
-        else:
-            return updater.update(regex)
-
-    def style(self):
-        return self.get_template("style.css")
-
-    def get_template(self, name):
-        try:
-            path = os.path.join(TEMPLATES_PATH, name)
-            fp = open(path, "r")
-            content = fp.read()
-            fp.close()
-            return content
-        except IOError:
-            return "File not found: " + name
-
-    index.exposed = True
-    media.exposed = True
-    regex.exposed = True
-    style.exposed = True
+        for module_data in modules_data["modules"]:
+            name = module_data["name"]
+            module = importlib.import_module("botserver.modules." + name)
+            # enable web access
+            setattr(self, name, module.access)
+            getattr(self, name).exposed = True
 
 def start(port):
     cherrypy.config.update({
@@ -75,6 +61,8 @@ def start(port):
             "tools.staticfile.filename": os.path.join(app_path, "templates/style.css")
         }
     }
-    cherrypy.tree.mount(CherryServer(), "/", config=config)
+    server = CherryServer()
+    server.load_modules()
+    cherrypy.tree.mount(server, "/", config=config)
     cherrypy.engine.start()
     cherrypy.engine.block()

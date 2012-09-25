@@ -47,14 +47,6 @@ WELCOMEMSG = 'Hello, #NICK!'
 FORTUNEMSG = "Your fortune for today is:\n#FORTUNE"
 NO_HELP_MSG = "There is no help message for this command!"
 
-def module_exists(module_name):
-    try:
-        importlib.import_module(module_name)
-    except:
-        return False
-    else:
-        return True
-
 class WstBotLoader:
 
     def load(self, debug=False):

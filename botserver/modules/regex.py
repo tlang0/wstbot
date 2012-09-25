@@ -21,14 +21,15 @@ import os
 import time
 import re
 import shutil
+from wstbot_locals import DATA_PATH, BACKUP_PATH
+from botserver.util import get_template_content
 
 ENCODING = "utf-8"
 
 # regex constants
 REGEX_FILE_NAME = "regex.yaml"
-REGEX_FILE_PATH = os.path.join("data", REGEX_FILE_NAME)
-BACKUP_DIRECTORY = "backup"
-REGEX_BACKUP_PATH = os.path.join(BACKUP_DIRECTORY, "regex")
+REGEX_FILE_PATH = os.path.join(DATA_PATH, REGEX_FILE_NAME)
+REGEX_BACKUP_PATH = os.path.join(BACKUP_PATH, "regex")
 
 class RegexUpdater:
     """Updates the regex info for regex retrieval"""
@@ -55,13 +56,11 @@ class RegexUpdater:
 
         # make a backup
         try:
-            os.mkdir(BACKUP_DIRECTORY)
+            os.mkdir(BACKUP_PATH)
         except os.error:
             pass
 
         shutil.copyfile(REGEX_FILE_PATH, os.path.join(REGEX_BACKUP_PATH, REGEX_FILE_NAME + str(time.time())))
-
-
 
     def make_page(self, template):
         if not os.path.exists(REGEX_FILE_PATH):
@@ -73,4 +72,9 @@ class RegexUpdater:
             content = content.decode(ENCODING)
             return template.replace(self.NEEDLE, content)
 
-
+def access(regex=None):
+    updater = RegexUpdater()
+    if regex is None:
+        return updater.make_page(get_template_content("regex.html"))
+    else:
+        return updater.update(regex)

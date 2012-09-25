@@ -16,16 +16,3 @@
 # You should have received a copy of the GNU General Public License
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
-
-from botserver import cherryserver
-
-class Server:
-
-    def __init__(self):
-        self.dependency = "cherrypy"
-        
-    def start(self, port):
-        cherryserver.start(port)
-
-if __name__ == "__main__":
-    Server().start(8111)

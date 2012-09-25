@@ -20,10 +20,12 @@
 import os
 import json
 from util import str_list_to_int
+from wstbot_locals import DATA_PATH, TEMPLATES_PATH
+from botserver.util import get_template_content
 
 # places newer entries on top if true
 SHOW_DESCENDING = True
-MEDIA_PATH = os.path.join("data", "media")
+MEDIA_PATH = os.path.join(DATA_PATH, "media")
 
 class MediaListBuilder:
     """Build an html media list from files containing the media URLs.
@@ -92,4 +94,6 @@ class MediaListBuilder:
         else:
             return 'corrupted data'
 
-
+def access(page=None, *args):
+    builder = MediaListBuilder()
+    return builder.build(get_template_content("media.html"), page)
