@@ -22,14 +22,14 @@ import botlog
 class Parser:
     """Base class for parsers"""
 
-    def __init__(self, bot, prefix):
+    def __init__(self, bot, logger):
         """Initialize module"""
-        if bot is None or prefix is None:
+        if bot is None:
             self.enabled = False
             return
         self.enabled = True
         self.bot = bot
-        self.log = self.bot.logger.create_default_interface("PARSER " + prefix)
+        self.logger = logger
 
     def do_parse(self, msg, nick):
         """

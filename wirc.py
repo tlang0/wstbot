@@ -22,6 +22,7 @@
 import socket
 import re
 import logging
+from wstbot_locals import STREAM_LOG_FORMAT, FILE_LOG_FORMAT
 
 ENCODING = "utf-8"
 FILE_LOG = "wirc.log"
@@ -40,15 +41,15 @@ class wIRC:
         
         self.connected = False
 
-        # init logger
+        # initialize logger
         self.debug = debug # sets self._debug
         # stream handler
         stream_handler = logging.StreamHandler()
-        stream_formatter = logging.Formatter("[%(name)s] (%(levelname)s) %(message)s")
+        stream_formatter = logging.Formatter(STREAM_LOG_FORMAT)
         stream_handler.setFormatter(stream_formatter)
         # file handler
         file_handler = logging.FileHandler(FILE_LOG)
-        file_formatter = logging.Formatter("%(asctime)s [%(name)s] (%(levelname)s) %(message)s")
+        file_formatter = logging.Formatter(FILE_LOG_FORMAT)
         file_handler.setFormatter(file_formatter)
         # add handlers
         logger.addHandler(stream_handler)
@@ -103,7 +104,7 @@ class wIRC:
             line=line.rstrip()
             if line == "":
                 continue
-            logger.debug("<- " + line)
+            logger.debug("<- {0}".format(line))
             self.on_receive(line)
 
             words=line.split(" ")
@@ -185,7 +186,7 @@ class wIRC:
             
     def send(self, message):
         self.sock.send(message.encode(ENCODING))
-        logger.debug("-> " + message)
+        logger.debug("-> {0}".format(message))
         
     def msg(self, target, message):
         self.send("PRIVMSG {0} :{1}\n".format(target, message))

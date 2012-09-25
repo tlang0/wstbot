@@ -29,18 +29,14 @@ FORTUNEDISABLED = "This category is currently disabled."
 
 class Fortune(Command):
     
-    def __init__(self, bot):
-        super().__init__(bot, "FORTUNE")
-        self.silent = False
-
-    def do(self, bot, argstr, nick):
+    def do(self, argstr, nick):
         if self.silent:
             return
         
         message = ""
         
         while True:
-            bot.log.info("Trying to get fortune message..")
+            self.logger.info("Trying to get fortune message..")
             
             if argstr.strip() != "":
                 message = self.fortune(argstr)

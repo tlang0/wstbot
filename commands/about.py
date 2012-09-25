@@ -22,9 +22,6 @@ from commands.command import Command
 
 class About(Command):
 
-    def __init__(self, bot):
-        super().__init__(bot, "ABOUT")
-
     def do(self, argstr, nick):
         try:
             return "Running on " + socket.gethostname()

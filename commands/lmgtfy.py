@@ -22,9 +22,6 @@ from commands.command import Command
 
 class Lmgtfy(Command):
 
-    def __init__(self, bot):
-        super().__init__(bot, "LMGTFY")
-
     def do(self, argstr, nick):
         if (argstr.strip() != ""):
             bot.chanmsg("http://lmgtfy.com/?q={0}".format(argstr.replace(" ", "+").strip()))
