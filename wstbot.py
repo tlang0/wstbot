@@ -47,22 +47,20 @@ WELCOMEMSG = 'Hello, #NICK!'
 FORTUNEMSG = "Your fortune for today is:\n#FORTUNE"
 NO_HELP_MSG = "There is no help message for this command!"
 
-class WstBotLoader:
+def wstbot_load(debug=False):
+    parser = configparser.SafeConfigParser()
+    parser.read("wstbot.conf")
 
-    def load(self, debug=False):
-        parser = configparser.SafeConfigParser()
-        parser.read("wstbot.conf")
+    server = parser.get("connection_data", "server")
+    port = int(parser.get("connection_data", "port"))
+    nick = parser.get("connection_data", "nick")
+    snick = parser.get("connection_data", "snick")
+    ident = parser.get("connection_data", "ident")
+    realname = parser.get("connection_data", "realname")
+    channel = parser.get("connection_data", "channel")
+    wstbot_server_port = int(parser.get("server_config", "port"))
 
-        server = parser.get("connection_data", "server")
-        port = int(parser.get("connection_data", "port"))
-        nick = parser.get("connection_data", "nick")
-        snick = parser.get("connection_data", "snick")
-        ident = parser.get("connection_data", "ident")
-        realname = parser.get("connection_data", "realname")
-        channel = parser.get("connection_data", "channel")
-        wstbot_server_port = int(parser.get("server_config", "port"))
-
-        return WstBot(server, nick, port, ident, realname, channel, server_port=wstbot_server_port, debug=debug)
+    return WstBot(server, nick, port, ident, realname, channel, server_port=wstbot_server_port, debug=debug)
 
 class WstBot(wirc.wIRC):
 
@@ -232,7 +230,7 @@ class WstBot(wirc.wIRC):
             return -1
 
 if __name__ == '__main__':
-    wstbot = WstBotLoader().load(debug=True)
+    wstbot = wstbot_load(debug=True)
     wstbot.connect()
 
     while True:
