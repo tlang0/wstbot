@@ -26,42 +26,59 @@ import importlib
 from wstbot_locals import DESCRIPTION_PATH 
 from botserver.util import get_template_content
 
+def load_modules_description():
+    fp = open(DESCRIPTION_PATH, "r")
+    modules_data = yaml.safe_load(fp)
+    fp.close()
+    return modules_data
+
 class CherryServer:
+
+    def __init__(self, modules_data):
+        self.modules_data = modules_data
 
     def index(self):
         return get_template_content("index.html")
 
     def load_modules(self):
         """Dynamically load server modules using the description file"""
-        fp = open(DESCRIPTION_PATH, "r")
-        modules_data = yaml.safe_load(fp)
-        fp.close()
-
-        if "modules" not in modules_data:
-            print("modules in modules.yaml not found")
+        if "modules" not in self.modules_data:
+            print("modules not found in modules.yaml")
             return
         
-        for module_data in modules_data["modules"]:
+        for module_data in self.modules_data["modules"]:
             name = module_data["name"]
             module = importlib.import_module("botserver.modules." + name)
             # enable web access
             setattr(self, name, module.access)
             getattr(self, name).exposed = True
 
+def make_config(modules_data):
+    if "static_templates" not in modules_data:
+        print("static_templates not found in modules.yaml")
+
+    app_path = os.path.dirname(os.path.abspath(__file__))
+    config = {}
+
+    # get a list of the file names
+    names = [template_data["name"] for template_data in modules_data["static_templates"]]
+
+    for name in names:
+        config["/" + name] = {
+            "tools.staticfile.on": True,
+            "tools.staticfile.filename": os.path.join(app_path, "templates/" + name)
+        }
+
+    return config
+
 def start(port):
+    modules_data = load_modules_description()
     cherrypy.config.update({
         "server.socket_port": port,
         "server.socket_host": "0.0.0.0"
     })
-    app_path = os.path.dirname(os.path.abspath(__file__))
-    config = {
-        "/style.css":
-        {
-            "tools.staticfile.on": True,
-            "tools.staticfile.filename": os.path.join(app_path, "templates/style.css")
-        }
-    }
-    server = CherryServer()
+    config = make_config(modules_data)
+    server = CherryServer(modules_data)
     server.load_modules()
     cherrypy.tree.mount(server, "/", config=config)
     cherrypy.engine.start()

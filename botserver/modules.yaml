@@ -1,3 +1,5 @@
+static_templates:
+- name: style.css
 modules:
 - name: media
 - name: regex
