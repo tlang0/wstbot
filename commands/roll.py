@@ -22,9 +22,6 @@ from commands.command import Command
 
 class Roll(Command):
 
-    def __init__(self, bot):
-        super().__init__(bot, "ROLL")
-
     def do(self, argstr, nick):
         maxroll = 100
             
@@ -32,14 +29,14 @@ class Roll(Command):
             try:
                 maxroll = int(argstr.strip())
             except:
-                bot.log.warn("rolling: given argument is not an integer")
+                self.logger.warning("rolling: given argument is not an integer")
                
         if maxroll > 0:
             try:
                 roll = random.choice(range(maxroll))
                 bot.chanmsg(nick + ' rolls ' + str(roll) + ' (0-' + str(maxroll) + ')')
             except:
-                bot.log.error("roll error!")
+                self.logger.error("roll error!")
 
 
     def get_cmd(self):

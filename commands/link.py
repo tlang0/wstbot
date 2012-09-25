@@ -24,9 +24,6 @@ class Link(Command):
 
     DEFAULT = "/media"
 
-    def __init__(self, bot):
-        super().__init__(bot, "LINK")
-
     def do(self, argstr, nick):
         parser = configparser.SafeConfigParser()
         parser.read("wstbot.conf")

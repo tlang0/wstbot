@@ -23,10 +23,11 @@
 import wirc
 import os
 import importlib
-import botlog
 import configparser
+import logging
 from colors import C
 from util import apply_seq
+from wstbot_locals import STREAM_LOG_FORMAT, FILE_LOG_FORMAT
 
 ##### DIRECTORIES / FILE PATHS #####
 
@@ -46,6 +47,8 @@ HELLOMSG = 'Hello, #CHANNEL! ' + HELPMSG
 WELCOMEMSG = 'Hello, #NICK!'
 FORTUNEMSG = "Your fortune for today is:\n#FORTUNE"
 NO_HELP_MSG = "There is no help message for this command!"
+
+logger = logging.getLogger(__name__)
 
 def wstbot_load(debug=False):
     parser = configparser.SafeConfigParser()
@@ -68,15 +71,29 @@ class WstBot(wirc.wIRC):
             server_port=8111, debug=False):
         wirc.wIRC.__init__(self, server, nick, port, ident, realname, debug)
         self.silent = False
+        self.chan = channel
+        self.server_port = server_port
 
         # initialize logger
-        self.logger = botlog.Logger(botlog.Printer(), botlog.FileWriter(FILE_LOG))
-        self.logger.enabled = debug
-        self.log = self.logger.create_default_interface("WSTBOT")
-        self.chan = channel
+        if debug:
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.INFO)
+        # stream handler
+        stream_handler = logging.StreamHandler()
+        stream_formatter = logging.Formatter(STREAM_LOG_FORMAT)
+        stream_handler.setFormatter(stream_formatter)
+        # file handler
+        file_handler = logging.FileHandler(FILE_LOG)
+        file_formatter = logging.Formatter(FILE_LOG_FORMAT)
+        file_handler.setFormatter(file_formatter)
+        # add handlers
+        logger.addHandler(stream_handler)
+        logger.addHandler(file_handler)
+
+        # load modules
         self.commands = self.objects_from_files(COMMANDS_DIR)
         self.keywords = self.objects_from_files(PARSING_DIR)
-        self.server_port = server_port
 
     def objects_from_files(self, directory):
         """
@@ -101,14 +118,14 @@ class WstBot(wirc.wIRC):
                 continue
 
             try:
-                self.log.info("Importing object '" + objectclass + "'...")
+                logger.info("Importing object '" + objectclass + "'...")
                 module = importlib.import_module("{0}.{1}".format(directory, objectmodule))
                 class_ = getattr(module, objectclass)
-                obj = class_(self)
+                obj = class_(self, logger)
                 objects.append(obj)
             except ImportError as err:
-                self.log.warn("Importing '{0}' from '{1}' was unsuccessful!".format(objectclass, objectfile))
-                self.log.warn("Reason: {}".format(err))
+                logger.warning("Importing '{0}' from '{1}' was unsuccessful!".format(objectclass, objectfile))
+                logger.warning("Reason: {}".format(err))
 
         return objects
 
@@ -141,9 +158,9 @@ class WstBot(wirc.wIRC):
     def on_privmsg(self, nick, ident, server, target, msg):    
         # parsing. accept direct messages too
         if msg is None:
-            self.log.warn("on_privmsg: msg was None")
+            logger.warning("on_privmsg: msg was None")
         if msg == "":
-            self.log.warn("on_privmsg: msg was empty")
+            logger.warning("on_privmsg: msg was empty")
         if msg[0] != "!":
             # check for keywords
             for cmd_obj in self.keywords:
@@ -239,7 +256,6 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             o = wstbot.provide_special_options()
             if o == -1:
-                wstbot.log.info("bye!")
-                wstbot.log.close()
+                logger.info("bye!")
                 wstbot.quit()
                 break

@@ -19,6 +19,11 @@
 
 import os
 
+# log format strings
+STREAM_LOG_FORMAT = "[%(module)s] (%(levelname)s) %(message)s"
+FILE_LOG_FORMAT = "%(asctime)s [%(module)s] (%(levelname)s) %(message)s"
+
+# general paths
 BACKUP_PATH = "backup"
 DATA_PATH = "data"
 

@@ -39,11 +39,11 @@ URL_PREFIX = "(?:https?://)(?:www\.)?"
 class Media(Parser):
     """Parse for URLs that could be of interest and store them"""
     
-    def __init__(self, bot):
-        super().__init__(bot, "MEDIA")
+    def __init__(self, *args):
+        super().__init__(*args)
 
         if not os.path.exists(MEDIA_PATH):
-            self.log.warn("Path does not exist: " + os.path.abspath(MEDIA_PATH))
+            self.logger.warning("Path does not exist: " + os.path.abspath(MEDIA_PATH))
             self.working = False
             return
 
@@ -55,7 +55,7 @@ class Media(Parser):
         else:
             new_file_name = str(max(filelist_int) + 1)
 
-        self.log.info("New media file: {0}".format(new_file_name))
+        self.logger.info("New media file: {0}".format(new_file_name))
         self.filepath = os.path.join(MEDIA_PATH, new_file_name)
         
     def parse(self, msg, nick):
@@ -71,7 +71,7 @@ class Media(Parser):
         media_info = self.chain_parse(url, [self.parse_image, self.parse_youtube, self.parse_link])
         # something went wrong
         if media_info is None:
-            self.log.warn("media_info was None")
+            self.logger.warning("media_info was None")
             return 
 
         # write
@@ -91,13 +91,13 @@ class Media(Parser):
             return None
 
         def imgur(url):
-            self.log.info("found imgur url")
+            self.logger.info("found imgur url")
             content = urllib.request.urlopen(url).read().decode(WEB_ENCODING)
             match1 = re.search('<a href="(.*)" target="_blank">View full resolution', content)
             match2 = re.search('<link rel="image_src" href="(.*)"\s*/>', content)
             match = match1 or match2
             if match:
-                self.log.info("imgur match")
+                self.logger.info("imgur match")
                 imageurl = match.group(1)
                 if imageurl:
                     return imageurl
@@ -113,7 +113,7 @@ class Media(Parser):
         if match is None and imgurmatch is None:
             return None
 
-        self.log.info("Found image url: " + url)
+        self.logger.info("Found image url: " + url)
         return ("image", url)
 
     def parse_youtube(self, url):
@@ -127,7 +127,7 @@ class Media(Parser):
             return
         video_id = match.group(1)
 
-        self.log.info("Found youtube video: " + video_id)
+        self.logger.info("Found youtube video: " + video_id)
         return ("youtube", video_id)
 
     def chain_parse(self, url, functions):

@@ -31,9 +31,6 @@ VIDEO_MESSAGE = C.BOLD + C.PURPLE \
 
 class Vimeo(Parser):
 
-    def __init__(self, bot):
-        super().__init__(bot, "VIMEO")
-
     def parse(self, msg, nick):
         if msg[-1] == "*" or not "vimeo." in msg:
             return
@@ -44,14 +41,14 @@ class Vimeo(Parser):
             return
 
         video_id = match.groups()[0]
-        self.log.info("found vimeo video id: " + video_id)
+        self.logger.info("found vimeo video id: " + video_id)
              
         url_video_data = "http://vimeo.com/api/v2/video/" + video_id + ".json"
         try:
             content_json = urllib.request.urlopen(url_video_data)
             content_json = content_json.read()
         except:
-            self.log.warn("an error occurred during urlopen!")
+            self.logger.warning("an error occurred during urlopen!")
 
         content = json.loads(content_json)
         content = content[0]
