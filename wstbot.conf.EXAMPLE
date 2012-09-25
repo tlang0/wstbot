@@ -1,14 +1,14 @@
 [connection_data]
 server = irc.se.quakenet.org
 port = 6667
-nick = wurstbrot_
-snick = wurstbrot__
+nick = wstbot_
+snick = wstbot__
 ident = WSTBOT
 realname = wIRC bot
-channel = #hibforum
+channel = #wstbottest
 
 [server_config]
 port = 8111
-address = http://wst.hopto.org
+address = http://localhost
 
 
