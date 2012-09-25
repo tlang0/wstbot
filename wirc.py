@@ -21,7 +21,6 @@
 
 import socket
 import re
-import botlog
 import logging
 
 ENCODING = "utf-8"
@@ -43,8 +42,17 @@ class wIRC:
 
         # init logger
         self.debug = debug # sets self._debug
-        logger.addHandler(StreamHandler())
-        logger.addHandler(FileHandler(FILE_LOG))
+        # stream handler
+        stream_handler = logging.StreamHandler()
+        stream_formatter = logging.Formatter("[%(name)s] (%(levelname)s) %(message)s")
+        stream_handler.setFormatter(stream_formatter)
+        # file handler
+        file_handler = logging.FileHandler(FILE_LOG)
+        file_formatter = logging.Formatter("%(asctime)s [%(name)s] (%(levelname)s) %(message)s")
+        file_handler.setFormatter(file_formatter)
+        # add handlers
+        logger.addHandler(stream_handler)
+        logger.addHandler(file_handler)
 
     @property
     def debug(self):
