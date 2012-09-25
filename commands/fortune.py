@@ -33,7 +33,7 @@ class Fortune(Command):
         super().__init__(bot, "FORTUNE")
         self.silent = False
 
-    def do(self, bot, argstr, nick):
+    def do(self, argstr, nick):
         if self.silent:
             return
         
