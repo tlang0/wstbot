@@ -23,6 +23,7 @@ import os
 import re
 import json
 import urllib.request
+import html
 from util import str_list_to_int
 from parsing.parser import Parser
 
@@ -71,14 +72,36 @@ class Media(Parser):
         media_info = self.chain_parse(url, [self.parse_image, self.parse_youtube, self.parse_link])
         # something went wrong
         if media_info is None:
-            self.logger.warning("media_info was None")
+            self.logger.debug("media_info was None")
             return 
+
+        media_info_dict = {"type": media_info[0], "url": media_info[1]}
+
+        # try to find a title
+        self.try_add_title(media_info_dict)
 
         # write
         fp = open(self.filepath, "a")
-        json.dump(media_info, fp)
+        json.dump(media_info_dict, fp)
         fp.write(os.linesep)
         fp.close()
+
+    def try_add_title(self, media_info_dict):
+        """Try to find a description for the link using the regex module
+        and add it to media_info_dict"""
+        try:
+            import parsing.regex
+        except ImportError:
+            return
+
+        regex_parser = parsing.regex.Regex(self.bot, self.logger)
+        url = media_info_dict["url"]
+        if media_info_dict["type"] == "youtube":
+            url = "http://www.youtube.com/watch?v=" + url
+        # get the resource name and title
+        data = regex_parser.find_info(url, name_and_title=True)
+        if data is not None:
+            media_info_dict["title"] = html.escape(data[1]) # title
 
     def parse_link(self, url):
         if not STORE_LINKS:

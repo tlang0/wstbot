@@ -146,14 +146,18 @@ class Regex(Parser):
             message = message.strip()[:-len(sep)].strip()
             
         return message
-            
-    def parse(self, msg, nick):
-        r = self.patterns_for_url(msg)
+
+    def find_info(self, string, name_and_title=False):
+        """Find the wanted information using the regular expressions"""
+        r = self.patterns_for_url(string)
         if r is None:
             return
         url, resource_dict = r
-        message = self.do_regex(url, resource_dict)
-        return message
+        output = self.do_regex(url, resource_dict, name_and_title=name_and_title)
+        return output
+            
+    def parse(self, msg, nick):
+        return self.find_info(msg)
 
     def do_replace(self, message, replacements):
         newmessage = message

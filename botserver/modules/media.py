@@ -70,7 +70,9 @@ class MediaListBuilder:
 
             # insert media
             for i, media_info_json in enumerate(media_iter):
+                # media_info should be a dict, in some versions it could be a list
                 media_info = json.loads(media_info_json)
+                media_info = self.media_info_to_dict(media_info)
                 htmldata += self.get_html(media_info)
                 if i < len(media_list):
                     htmldata += "<hr />\n"
@@ -79,20 +81,39 @@ class MediaListBuilder:
 
         return template.replace("{media}", htmldata)
 
+    def media_info_to_dict(self, x):
+        if type(x) == list:
+            return {"type": x[0], "url": x[1]}
+        return x
+
     def get_html(self, media_info):
-        url = media_info[1]
+        """media_info should be a dict"""
+        url = media_info["url"]
         if url[-1] == os.linesep:
             url = url[:-1]
-        type_ = media_info[0]
+        type_ = media_info["type"]
+        # start constructing the output
+        html_str = "<p>"
+        title = ""
+        if "title" in media_info:
+            title = media_info["title"]
+        # add the actual content
         if type_ == "link":
-            return '<p><a href="{0}" title="Some link">{0}</a></p>\n'.format(url)
+            if title == "":
+                title = url
+            html_str += '<a href="{0}" title="{1}">{1}</a>'.format(url, title)
         elif type_ == "image":
-            return '<p><img src="{0}" alt="Some image" /></p>\n'.format(url)
+            html_str += '<img src="{0}" alt="{1}" title={2} />'.format(url, title, title)
         elif type_ == "youtube":
-            return ('<p><iframe width="560" height="315" src="http://www.youtube.com/embed/{0}" ' \
-                    + 'frameborder="0" allowfullscreen></iframe>').format(url)
+            if title != "":
+                html_str += "<div><strong>" + title + "</strong></div>\n"
+            html_str += ('<iframe width="560" height="315" src="http://www.youtube.com/embed/{0}" ' \
+                    + 'frameborder="0" title="{1}" allowfullscreen></iframe>').format(url, title)
         else:
             return 'corrupted data'
+
+        html_str += "</p>\n"
+        return html_str
 
 def access(page=None, *args):
     builder = MediaListBuilder()
