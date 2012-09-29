@@ -1,0 +1,20 @@
+.navigation {
+    width: 30em;
+    height: 2em;
+    margin: 0 auto;
+    margin-bottom: 2em;
+    margin-top: 2em;
+    clear: both;
+}
+
+.navigation div {
+    float: left;
+}
+
+.navigation div+div {
+    float: right;
+}
+
+img {
+    clear: both;
+}
