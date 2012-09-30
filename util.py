@@ -17,11 +17,24 @@
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
+import re
+from wstbot_locals import URL_REGEX_PREFIX
+
+def parse_for_url(message):
+    """Try to find a URL in the message."""
+
+    match = re.search(URL_REGEX_PREFIX + "\S+", message)
+    if match is not None:
+        return match.group(0)
+    return None
+
 def apply_seq(function, sequence):
+    """Applies a function to every element of the sequence"""
     for item in sequence: 
         function(item)
 
 def str_list_to_int(l):
+    """Converts a list of strings to a list of integers"""
     new_list = []
     for e in l:
         try:

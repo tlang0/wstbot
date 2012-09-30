@@ -26,17 +26,13 @@ from colors import C
 from parsing.parser import Parser
 
 ERROR_MESSAGE = "An error occured while retrieving information about the vimeo video."
-VIDEO_MESSAGE = C.BOLD + C.PURPLE \
-        + "#TITLE" + C.NOFO + C.BLACK + " :: " + C.GREEN + "#DURATION"
+VIDEO_MESSAGE = C.BOLD + C.PURPLE + "#TITLE" + C.NOFO + C.BLACK + " :: " + C.GREEN + "#DURATION"
 
 class Vimeo(Parser):
 
     def parse(self, msg, nick):
-        if msg[-1] == "*" or not "vimeo." in msg:
-            return
-
-        # video id
-        match = re.search('vimeo\.com/(.*)', msg)
+        # get video id
+        match = re.search('vimeo\.com/(\S*)', msg)
         if not match or not match.groups()[0]:
             return
 

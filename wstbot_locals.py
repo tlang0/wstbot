@@ -19,6 +19,8 @@
 
 import os
 
+URL_REGEX_PREFIX = "(?:https?://)(?:www\.)?"
+
 # log format strings
 STREAM_LOG_FORMAT = "[%(module)s] (%(levelname)s) %(message)s"
 FILE_LOG_FORMAT = "%(asctime)s [%(module)s] (%(levelname)s) %(message)s"

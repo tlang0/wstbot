@@ -24,10 +24,10 @@ import re
 import yaml
 import html.parser
 import os
+import util
 from colors import colors, styles
 from parsing.parser import Parser
 
-#URL_PREFIX = '(https?://)(www\.)?'
 WEB_ENCODING = "utf-8"
 REGEX_FILE = os.path.join("data", "regex.yaml")
 
@@ -41,28 +41,17 @@ class Regex(Parser):
         """Get the information dict from the yaml file for the url contained in msg.
         Returns a tuple (url, resource_dict) where info is the yaml dict"""
 
-        # do not display
-        if msg[-1] == '*':
-            return
-
         # valid ?
-        if not "http://" in msg and not "www" in msg:
+        msg_url = util.parse_for_url(msg)
+        if msg_url is None:
             return
 
         self.logger.info("last message was a link!")
 
-        # load
-        fp = open(REGEX_FILE, "r")
-        self.regexdata = yaml.safe_load(fp)
-        fp.close()
+        # load regex strings
+        with open(REGEX_FILE, "r") as regex_file
+            self.regexdata = yaml.safe_load(regex_file)
         
-        try:
-            url_match = re.search("((https?://)(www\.)?\S+)", msg)
-            msg_url = url_match.group(1)
-        except:
-            self.logger.warning("no link found")
-            return
-
         for resource_dict in self.regexdata["sources"]:
             try:
                 match = re.search(resource_dict["url pattern"], msg_url)

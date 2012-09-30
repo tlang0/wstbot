@@ -40,7 +40,9 @@ class Parser:
         The return string will be sent to the active channel.
         """
         
-        if self.enabled:
+        if msg is None or msg.strip()[-1] == "*" or not self.enabled:
+            return None
+        else:
             return self.parse(msg, nick)
         
     def parse(self, msg, nick):
