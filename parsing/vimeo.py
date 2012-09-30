@@ -41,16 +41,17 @@ class Vimeo(Parser):
              
         url_video_data = "http://vimeo.com/api/v2/video/" + video_id + ".json"
         try:
-            content_json = urllib.request.urlopen(url_video_data)
-            content_json = content_json.read()
+            content = urllib.request.urlopen(url_video_data).read()
         except:
             self.logger.warning("an error occurred during urlopen!")
+            return
 
-        content = json.loads(content_json)
-        content = content[0]
+        content = str(content, "utf-8")
+        content_json = json.loads(content)
+        content_json = content_json[0]
     
-        title = content["title"]
-        secs = int(content["duration"])
+        title = content_json["title"]
+        secs = int(content_json["duration"])
         duration = str(secs / 60) + "m " + str(secs % 60) + "s"
 
         message = VIDEO_MESSAGE.format(title=title, duration=duration)
