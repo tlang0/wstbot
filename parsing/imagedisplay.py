@@ -2,7 +2,7 @@ import re
 from wstbot_locals import URL_REGEX_PREFIX
 from parsing.parser import Parser
 
-OH_NO = "Your Jabber client doesn't show images. Change that."
+OH_NO = "Your XMPP client doesn't show images."
 
 class ImageDisplay(Parser):
     
