@@ -26,7 +26,7 @@ from colors import C
 from parsing.parser import Parser
 
 ERROR_MESSAGE = "An error occured while retrieving information about the vimeo video."
-VIDEO_MESSAGE = C.BOLD + C.PURPLE + "#TITLE" + C.NOFO + C.BLACK + " :: " + C.GREEN + "#DURATION"
+VIDEO_MESSAGE = C.BOLD + C.PURPLE + "{title}" + C.NOFO + C.BLACK + " :: " + C.GREEN + "{duration}"
 
 class Vimeo(Parser):
 
@@ -53,7 +53,6 @@ class Vimeo(Parser):
         secs = int(content["duration"])
         duration = str(secs / 60) + "m " + str(secs % 60) + "s"
 
-        message = VIDEO_MESSAGE.replace("#TITLE", title)
-        message = message.replace("#DURATION", duration)
+        message = VIDEO_MESSAGE.format(title=title, duration=duration)
 
         return message

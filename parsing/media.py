@@ -24,8 +24,9 @@ import re
 import json
 import urllib.request
 import html
-from util import str_list_to_int
+from util import str_list_to_int, parse_for_url
 from parsing.parser import Parser
+from wstbot_locals import URL_REGEX_PREFIX
 
 # what kinds of links should be stored?
 STORE_IMAGES = True
@@ -34,8 +35,6 @@ STORE_LINKS = True # meaning all other links
 
 WEB_ENCODING = "utf-8"
 MEDIA_PATH = os.path.join("data", "media")
-
-URL_PREFIX = "(?:https?://)(?:www\.)?"
 
 class Media(Parser):
     """Parse for URLs that could be of interest and store them"""
@@ -63,12 +62,11 @@ class Media(Parser):
         if not self.working or msg[-1] == "*":
             return
 
-        match_link = re.search(".*(" + URL_PREFIX + "\S+).*", msg)
+        url = parse_for_url(msg)
         # no link found
-        if match_link is None:
+        if url is None:
             return
 
-        url = match_link.group(1)
         media_info = self.chain_parse(url, [self.parse_image, self.parse_youtube, self.parse_link])
         # something went wrong
         if media_info is None:
@@ -81,10 +79,9 @@ class Media(Parser):
         self.try_add_title(media_info_dict)
 
         # write
-        fp = open(self.filepath, "a")
-        json.dump(media_info_dict, fp)
-        fp.write(os.linesep)
-        fp.close()
+        with open(self.filepath, "a") as fp:
+            json.dump(media_info_dict, fp)
+            fp.write(os.linesep)
 
     def try_add_title(self, media_info_dict):
         """Try to find a description for the link using the regex module
@@ -128,8 +125,8 @@ class Media(Parser):
                 return None
 
         # prefix for URLs in general
-        match = re.search("(" + URL_PREFIX + ".*(\.jpeg|\.jpg|\.png|\.gif))", url)
-        imgurmatch = re.search("(" + URL_PREFIX + "imgur.com/(.*/)?((\d|\w)*)(/)?)", url)
+        match = re.search("(" + URL_REGEX_PREFIX + ".*(\.jpeg|\.jpg|\.png|\.gif))", url)
+        imgurmatch = re.search("(" + URL_REGEX_PREFIX + "imgur.com/(.*/)?((\d|\w)*)(/)?)", url)
         if imgurmatch:
             url = imgur(imgurmatch.group(1))
 
@@ -143,8 +140,8 @@ class Media(Parser):
         if not STORE_YOUTUBE:
             return None
 
-        match_youtube = re.search(URL_PREFIX + "youtube\.com/watch.*v=(\S{11})", url)
-        match_youtube_short = re.search(URL_PREFIX + "youtu\.be/(\S+)", url)
+        match_youtube = re.search(URL_REGEX_PREFIX + "youtube\.com/watch.*v=(\S{11})", url)
+        match_youtube_short = re.search(URL_REGEX_PREFIX + "youtu\.be/(\S+)", url)
         match = match_youtube or match_youtube_short
         if match is None:
             return
