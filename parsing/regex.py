@@ -49,7 +49,7 @@ class Regex(Parser):
         self.logger.info("last message was a link!")
 
         # load regex strings
-        with open(REGEX_FILE, "r") as regex_file
+        with open(REGEX_FILE, "r") as regex_file:
             self.regexdata = yaml.safe_load(regex_file)
         
         for resource_dict in self.regexdata["sources"]:
