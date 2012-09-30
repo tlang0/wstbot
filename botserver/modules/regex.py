@@ -82,6 +82,6 @@ class RegexUpdater:
     index.exposed = True
     update.exposed = True
 
-def access():
+def get():
     updater = RegexUpdater(get_template_content("regex.html"))
     return updater

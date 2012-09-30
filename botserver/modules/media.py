@@ -130,6 +130,6 @@ class MediaListBuilder:
         html_str += "</li>\n"
         return html_str
 
-def access():
+def get():
     builder = MediaListBuilder()
     return builder

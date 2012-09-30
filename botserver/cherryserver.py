@@ -51,7 +51,7 @@ class CherryServer:
             name = module_data["name"]
             module = importlib.import_module("botserver.modules." + name)
             # enable web access
-            setattr(self, name, module.access())
+            setattr(self, name, module.get())
             #getattr(self, name).exposed = True
 
 def make_config_base():
