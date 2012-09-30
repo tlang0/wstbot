@@ -17,13 +17,13 @@
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
-from util import objects_from_files
+from util import get_directory_modules_objects
 
 SETUP_DIR = "setup"
 
 def setup():
     """Call all setup modules"""
-    setup_objects = objects_from_files(SETUP_DIR, lambda class_: class_())
+    setup_objects = get_directory_modules_objects(SETUP_DIR)
     for setup in setup_objects:
         setup.setup()
 

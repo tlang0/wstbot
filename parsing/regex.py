@@ -154,3 +154,5 @@ class Regex(Parser):
     def unescape(self, message):
         parser = html.parser.HTMLParser()
         return parser.unescape(message)
+
+CLASS_ = Regex

@@ -149,3 +149,5 @@ class Media(Parser):
             if r is not None:
                 break
         return r
+
+CLASS_ = Media

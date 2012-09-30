@@ -41,3 +41,5 @@ class Media:
 
 if __name__ == "__main__":
     Media().setup()
+
+CLASS_ = Media

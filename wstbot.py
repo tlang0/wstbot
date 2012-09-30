@@ -21,7 +21,7 @@
 
 import configparser
 import logging
-from util import apply_seq, objects_from_files
+from util import apply_seq, get_directory_modules_objects
 from wstbot_locals import STREAM_LOG_FORMAT, FILE_LOG_FORMAT
 
 ##### DIRECTORIES / FILE PATHS #####
@@ -70,11 +70,11 @@ class WstBot:
         logger.addHandler(file_handler)
 
         # function to instantiate command and parsing objects (closure)
-        fi = lambda class_: class_(self, logger)
+        instantiator = lambda class_: class_(self, logger)
 
         # load modules
-        self.commands = objects_from_files(COMMANDS_DIR, fi)
-        self.keywords = objects_from_files(PARSING_DIR, fi)
+        self.commands = get_directory_modules_objects(COMMANDS_DIR, f=instantiator)
+        self.keywords = get_directory_modules_objects(PARSING_DIR, f=instantiator)
 
     def get_command_object(self, cmd):
         if cmd.strip() == "":

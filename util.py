@@ -22,6 +22,7 @@ import os
 import re
 import urllib.request
 import importlib
+import glob
 from wstbot_locals import URL_REGEX_PREFIX
 from wstbot_locals import WEB_READ_MAX, WEB_ENCODING
 
@@ -57,41 +58,57 @@ def str_list_to_int(l):
 
     return new_list
 
-def objects_from_files(directory, f=None):
-    """
-    1. Read files from a folder
-    2. Create objects from the classes contained in the files which should
-       have the same name as the file, with the first letter in upper case
+def get_directory_modules(directory):
+    """Return a list of python modules in a directory. 
+    Files not ending with '.py' are ignored. 
+    May throw an OSError."""
 
-       - f is the function that is used to instantiate the class and is
-       called with the class as argument: f(class)
-    """
+    modules = []
 
-    if f is None:
-        f = lambda c: c()
-    
-    objects = []
-
-    # Load object objects
-    for objectfile in os.listdir(directory):
-        if objectfile[-2:] != "py" or objectfile[0] in [".", "_"]:
+    # get file names
+    filenames = glob.glob(os.path.join(directory, "*.py"))
+    filenames = (os.path.basename(x) for x in filenames)
+    # get module names
+    module_names = (os.path.splitext(x)[0] for x in filenames)
+    # import modules
+    for module_name in module_names:
+        # ignore __init__ and so on:
+        if module_name[1] == "_":
             continue
 
-        objectclass = objectfile[0].upper() + objectfile[1:objectfile.rfind('.')]
-        objectmodule = objectclass.lower()
-
-        # omit templates (abstract classes)
-        if objectmodule == "command" or objectmodule == "parser":
-            continue
-
+        module_path = "{}.{}".format(directory, module_name)
         try:
-            logging.info("Importing object '" + objectclass + "'...")
-            module = importlib.import_module("{0}.{1}".format(directory, objectmodule))
-            class_ = getattr(module, objectclass)
-            obj = f(class_)
-            objects.append(obj)
+            logging.info("Importing module '" + module_name + "'...")
+            modules.append(importlib.import_module(module_path))
         except ImportError as err:
-            logging.warning("Importing '{0}' from '{1}' was unsuccessful!".format(objectclass, objectfile))
+            logging.warning("Importing '{0}' was unsuccessful!".format(module_path))
             logging.warning("Reason: {}".format(err))
 
-    return objects
+    return modules
+
+def get_directory_modules_objects(directory, f=lambda x: x(), getter="get"):
+    """Get all modules from a directory (see get_directory_modules), call a function
+    in each of them and return its results. The getter function is 'get' by wstbot convention
+    and the results are usually objects, therefore the name of this function.
+
+    f will be used to call the getter function.
+
+    If there is no getter function, look for a CLASS_ variable and try
+    to instantiate it using f."""
+
+    results = []
+    modules = get_directory_modules(directory)
+    for module in modules:
+        # try to call the getter function
+        func = getattr(module, getter, None)
+        if func is not None:
+            results.append(f(func))
+        else:
+            # try to instantiate the class
+            class_ = getattr(module, "CLASS_", None)
+            if class_ is not None:
+                results.append(f(class_))
+            else:
+                logging.warning("Nothing to instantiate in {}!".format(module.__name__))
+
+    return results

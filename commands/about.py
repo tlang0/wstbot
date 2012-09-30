@@ -33,3 +33,5 @@ class About(Command):
 
     def get_help(self):
         return "Information about the computer the bot is running on."
+
+CLASS_ = About

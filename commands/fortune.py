@@ -120,3 +120,5 @@ class Fortune(Command):
 
     def get_help(self):
         return "Get a random fortune or a schneier fact with '!fortune schneier'"
+
+CLASS_ = Fortune

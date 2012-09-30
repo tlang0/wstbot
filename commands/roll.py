@@ -44,3 +44,5 @@ class Roll(Command):
     def get_help(self):
         return "!roll [limit]\nGenerate a random integer in the interval [0,limit]. " \
             + "By default, limit is 100."
+
+CLASS_ = Roll

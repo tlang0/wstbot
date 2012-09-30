@@ -19,7 +19,7 @@
 
 from commands.command import Command
 
-class Youtubefrontend(Command):
+class YoutubeFrontend(Command):
 
     def do(self, argstr, nick):
         argstr = argstr.strip()
@@ -42,3 +42,5 @@ class Youtubefrontend(Command):
     def get_help(self):
         return "!youtube <user> <option>\n<user>: The user account\n" + \
             "<option>: One of: relevance, published, viewCount, rating"
+
+CLASS_ = YoutubeFrontend

@@ -31,3 +31,5 @@ class Lmgtfy(Command):
 
     def get_help(self):
         return "!lmgtfy <term>\nLet me google that for you. "
+
+CLASS_ = Lmgtfy
