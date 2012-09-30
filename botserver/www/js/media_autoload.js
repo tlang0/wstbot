@@ -6,7 +6,7 @@ $(function() {
         if (just_reached_bottom === true) {
             return;
         }
-        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() * 0.90) {
             just_reached_bottom = true;
             load_content();
         }
