@@ -37,6 +37,7 @@ class CherryServer:
     def __init__(self, modules_data):
         self.modules_data = modules_data
 
+    @cherrypy.expose
     def index(self):
         return get_template_content("index.html")
 
@@ -52,8 +53,6 @@ class CherryServer:
             # enable web access
             setattr(self, name, module.access)
             getattr(self, name).exposed = True
-
-    index.exposed = True
 
 def make_config(modules_data):
     if "static_templates" not in modules_data:
