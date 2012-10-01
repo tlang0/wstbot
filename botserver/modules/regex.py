@@ -23,6 +23,7 @@ import re
 import shutil
 from wstbot_locals import DATA_PATH, BACKUP_PATH
 from botserver.util import get_template_content
+from string import Template
 
 ENCODING = "utf-8"
 
@@ -33,8 +34,6 @@ REGEX_BACKUP_PATH = os.path.join(BACKUP_PATH, "regex")
 
 class RegexUpdater:
     """Updates the regex info for regex retrieval"""
-
-    NEEDLE = "{regexdata}"
     
     def update(self, regexdata):
         if regexdata is None:
@@ -62,15 +61,16 @@ class RegexUpdater:
 
         shutil.copyfile(REGEX_FILE_PATH, os.path.join(REGEX_BACKUP_PATH, REGEX_FILE_NAME + str(time.time())))
 
-    def make_page(self, template):
-        if not os.path.exists(REGEX_FILE_PATH):
-            return template.replace(self.NEEDLE, "")
-        else:
-            fp = open(REGEX_FILE_PATH, "rb")
-            content = fp.read()
-            fp.close()
+    def make_page(self, html_template):
+        template = Template(html_template)
+        content = ""
+        if os.path.exists(REGEX_FILE_PATH):
+            with open(REGEX_FILE_PATH, "rb") as fp:
+                content = fp.read()
             content = content.decode(ENCODING)
-            return template.replace(self.NEEDLE, content)
+
+        new_html = template.substitute(regexdata=content)
+        return new_html
 
 def access(regex=None):
     updater = RegexUpdater()
