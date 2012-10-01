@@ -53,6 +53,8 @@ class CherryServer:
             setattr(self, name, module.access)
             getattr(self, name).exposed = True
 
+    index.exposed = True
+
 def make_config(modules_data):
     if "static_templates" not in modules_data:
         print("static_templates not found in modules.yaml")
