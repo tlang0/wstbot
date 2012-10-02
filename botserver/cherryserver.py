@@ -51,8 +51,8 @@ class CherryServer:
             name = module_data["name"]
             module = importlib.import_module("botserver.modules." + name)
             # enable web access
-            setattr(self, name, module.access)
-            getattr(self, name).exposed = True
+            setattr(self, name, module.access())
+            #getattr(self, name).exposed = True
 
 def make_config(modules_data):
     if "static_templates" not in modules_data:

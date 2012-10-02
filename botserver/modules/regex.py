@@ -34,6 +34,12 @@ REGEX_BACKUP_PATH = os.path.join(BACKUP_PATH, "regex")
 
 class RegexUpdater:
     """Updates the regex info for regex retrieval"""
+
+    def __init__(self, html_template):
+        self.html_template = html_template
+
+    def index(self, regex=None):
+        return self.make_page(self.html_template)
     
     def update(self, regexdata):
         if regexdata is None:
@@ -72,9 +78,9 @@ class RegexUpdater:
         new_html = template.substitute(regexdata=content)
         return new_html
 
-def access(regex=None):
-    updater = RegexUpdater()
-    if regex is None:
-        return updater.make_page(get_template_content("regex.html"))
-    else:
-        return updater.update(regex)
+    index.exposed = True
+    update.exposed = True
+
+def access():
+    updater = RegexUpdater(get_template_content("regex.html"))
+    return updater
