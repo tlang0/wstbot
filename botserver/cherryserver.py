@@ -72,7 +72,6 @@ def start(port):
     })
     config = make_config_base()
     cherrypy._cpconfig.merge(config, SERVER_CONFIG_PATH)
-    print(config)
     server = CherryServer(modules_data)
     server.load_modules()
     cherrypy.tree.mount(server, "/", config=config)
