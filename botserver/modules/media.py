@@ -96,14 +96,18 @@ class MediaListBuilder:
                 next_html += ('<a href="{0}" title="next page">next page -&gt;'
                     + '</a>\n').format(build_navigation_link(1))
 
+            htmldata += "<ul>\n"
+
             # insert media
             for i, media_info_json in enumerate(media_iter):
                 # media_info should be a dict, in some versions it could be a list
                 media_info = json.loads(media_info_json)
                 media_info = self.media_info_to_dict(media_info)
-                htmldata += self.get_html(media_info)
+                htmldata += self.make_html(media_info)
                 if i < len(media_list):
                     htmldata += "<hr />\n"
+            
+            htmldata += "</ul>\n"
 
         new_html = template.substitute(
                 navprev=prev_html,
@@ -117,14 +121,14 @@ class MediaListBuilder:
             return {"type": x[0], "url": x[1]}
         return x
 
-    def get_html(self, media_info):
+    def make_html(self, media_info):
         """media_info should be a dict"""
         url = media_info["url"]
         if url[-1] == os.linesep:
             url = url[:-1]
         type_ = media_info["type"]
         # start constructing the output
-        html_str = "<p>"
+        html_str = "<li>"
         title = ""
         if "title" in media_info:
             title = media_info["title"]
@@ -137,13 +141,13 @@ class MediaListBuilder:
             html_str += '<img src="{0}" alt="{1}" title={2} />'.format(url, title, title)
         elif type_ == "youtube":
             if title != "":
-                html_str += "<div><strong>" + title + "</strong></div>\n"
+                html_str += '<div class="item-title">{0}</div>\n'.format(title)
             html_str += ('<iframe width="560" height="315" src="http://www.youtube.com/embed/{0}" ' \
                     + 'frameborder="0" title="{1}" allowfullscreen></iframe>').format(url, title)
         else:
             return 'corrupted data'
 
-        html_str += "</p>\n"
+        html_str += "</li>\n"
         return html_str
 
     index.exposed = True
