@@ -61,7 +61,7 @@ class Regex(Parser):
             if not match:
                 continue
 
-            url = match.groups()[0]
+            url = match.group(1)
             self.logger.info("Found information from " + resource_dict["name"] + "!")
             self.logger.info("url: " + url)
 
@@ -99,15 +99,11 @@ class Regex(Parser):
             if match is None:
                 self.logger.warning("Could not find info! (match == None)")
                 break
-            if match.groups() is None or match.groups()[0] is None:
+            if match.groups() is None:
+                self.logger.warning("match.groups() was None")
+                break
+            if len(match.groups()) <= 0:
                 self.logger.warning("Found match but no groups")
-                try:
-                    self.logger.warning("the pattern was: " + info["pattern"])
-                    self.logger.warning("match.groups(): " + str(match.groups()))
-                    self.logger.warning("match.group(0): " + str(match.group(0)))
-                    self.logger.warning("match.group(1): " + str(match.group(1)))
-                except IndexError:
-                    pass
                 break
 
             infodata = match.groups()[0]
