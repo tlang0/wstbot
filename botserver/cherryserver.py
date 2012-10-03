@@ -23,7 +23,7 @@ import time
 import shutil
 import yaml
 import importlib
-from wstbot_locals import DESCRIPTION_PATH, TEMPLATES_PATH
+from wstbot_locals import DESCRIPTION_PATH, TEMPLATES_PATH, SERVER_CONFIG_PATH
 from botserver.util import get_template_content
 
 def load_modules_description():
@@ -54,21 +54,13 @@ class CherryServer:
             setattr(self, name, module.access())
             #getattr(self, name).exposed = True
 
-def make_config(modules_data):
-    if "static_templates" not in modules_data:
-        print("static_templates not found in modules.yaml")
-
+def make_config_base():
     app_path = os.path.abspath(".")
     config = {}
 
-    # get a list of the file names
-    names = [template_data["name"] for template_data in modules_data["static_templates"]]
-
-    for name in names:
-        config["/" + name] = {
-            "tools.staticfile.on": True,
-            "tools.staticfile.filename": os.path.join(app_path, TEMPLATES_PATH, name)
-        }
+    config["/"] = {
+        "tools.staticdir.root": os.path.join(app_path, TEMPLATES_PATH)
+    }
 
     return config
 
@@ -78,7 +70,9 @@ def start(port):
         "server.socket_port": port,
         "server.socket_host": "0.0.0.0"
     })
-    config = make_config(modules_data)
+    config = make_config_base()
+    cherrypy._cpconfig.merge(config, SERVER_CONFIG_PATH)
+    print(config)
     server = CherryServer(modules_data)
     server.load_modules()
     cherrypy.tree.mount(server, "/", config=config)

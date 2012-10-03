@@ -1,6 +1,3 @@
-static_templates:
-- name: style.css
-- name: media.css
 modules:
 - name: media
 - name: regex
