@@ -23,7 +23,7 @@ import time
 import shutil
 import yaml
 import importlib
-from wstbot_locals import DESCRIPTION_PATH 
+from wstbot_locals import DESCRIPTION_PATH, TEMPLATES_PATH
 from botserver.util import get_template_content
 
 def load_modules_description():
@@ -58,7 +58,7 @@ def make_config(modules_data):
     if "static_templates" not in modules_data:
         print("static_templates not found in modules.yaml")
 
-    app_path = os.path.dirname(os.path.abspath(__file__))
+    app_path = os.path.abspath(".")
     config = {}
 
     # get a list of the file names
@@ -67,7 +67,7 @@ def make_config(modules_data):
     for name in names:
         config["/" + name] = {
             "tools.staticfile.on": True,
-            "tools.staticfile.filename": os.path.join(app_path, "templates/" + name)
+            "tools.staticfile.filename": os.path.join(app_path, TEMPLATES_PATH, name)
         }
 
     return config
