@@ -4,7 +4,7 @@ body {
 
 .navigation {
     width: 30em;
-    height: 2em;
+    height: 1em;
     margin: 0 auto;
     margin-bottom: 2em;
     margin-top: 2em;
@@ -30,4 +30,18 @@ img {
 ul {
     list-style-type: none;
     padding: 0;
+}
+
+hr {
+    border: 0;
+    width: 45%;
+    color: #bbb;
+    background-color: #bbb;
+    height: 1px;
+}
+
+.nav-divider {
+    width: 100%;
+    color: #666;
+    background-color: #666;
 }

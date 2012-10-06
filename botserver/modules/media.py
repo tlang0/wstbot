@@ -104,7 +104,7 @@ class MediaListBuilder:
                 media_info = json.loads(media_info_json)
                 media_info = self.media_info_to_dict(media_info)
                 htmldata += self.make_html(media_info)
-                if i < len(media_list):
+                if i < len(media_list) - 1:
                     htmldata += "<hr />\n"
             
             htmldata += "</ul>\n"
