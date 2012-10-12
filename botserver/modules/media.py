@@ -142,7 +142,7 @@ class MediaListBuilder:
         elif type_ == "youtube":
             if title != "":
                 html_str += '<div class="item-title">{0}</div>\n'.format(title)
-            html_str += ('<iframe width="560" height="315" src="http://www.youtube.com/embed/{0}" ' \
+            html_str += ('<iframe width="720" height="405" src="http://www.youtube.com/embed/{0}" ' \
                     + 'frameborder="0" title="{1}" allowfullscreen></iframe>').format(url, title)
         else:
             return 'corrupted data'
