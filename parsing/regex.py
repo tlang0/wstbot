@@ -25,7 +25,6 @@ import yaml
 import html.parser
 import os
 import util
-from colors import colors, styles
 from parsing.parser import Parser
 
 WEB_ENCODING = "utf-8"
@@ -121,9 +120,9 @@ class Regex(Parser):
                 
             if message is None:
                 message = ""
-            message += styles[info["style"]] + colors[info["color"]] + infodata 
+            message += self.msg_formats.get(info["style"], self.msg_formats.get(info["color"], infodata))
             if info != resource_dict["patterns"][-1]:
-                message += " " + styles["default"] + colors["default"] + self.regexdata["separator"] + " "
+                message += " " + self.regexdata["separator"] + " "
 
         # cut last separator if there is one
         sep = self.regexdata["separator"]

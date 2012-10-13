@@ -53,3 +53,36 @@ class C:
 colors = {"default": C.NORMAL, "black": C.BLACK, "blue": C.BLUE, "green": C.GREEN, 
         "red": C.RED, "purple": C.PURPLE}
 styles = {"default": C.NOFO, "bold": C.BOLD}
+
+class Formats:
+
+    def get(self, format_name, message):
+        return getattr(self, format_name)(message)
+
+class IRCFormats(Formats):
+
+    def black(self, message):
+        return C.BLACK + message + C.NORMAL
+
+    def blue(self, message):
+        return C.BLUE + message + C.NORMAL
+
+    def green(self, message):
+        return C.GREEN + message + C.NORMAL
+
+    def red(self, message):
+        return C.RED + message + C.NORMAL
+
+    def purple(self, message):
+        return C.PURPLE + message + C.NORMAL
+
+    def bold(self, message):
+        return C.BOLD + message + C.NOFO
+
+class XMPPFormats(Formats):
+
+    def __getattr__(self, name):
+        return self.format
+
+    def format(self, message):
+        return message

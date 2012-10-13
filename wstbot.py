@@ -23,7 +23,6 @@ import os
 import importlib
 import configparser
 import logging
-from colors import C
 from util import apply_seq
 from wstbot_locals import STREAM_LOG_FORMAT, FILE_LOG_FORMAT
 
@@ -47,33 +46,34 @@ FORTUNEMSG = "Your fortune for today is:\n#FORTUNE"
 NO_HELP_MSG = "There is no help message for this command!"
 
 logger = logging.getLogger(__name__)
+logger.propagate = False
 
 class WstBot:
 
     def __init__(self, transport, debug=False):
         # initialize logger
-    if debug:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
+        if debug:
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.INFO)
 
-    self.transport = transport
+        self.transport = transport
 
-    # stream handler
-    stream_handler = logging.StreamHandler()
-    stream_formatter = logging.Formatter(STREAM_LOG_FORMAT)
-    stream_handler.setFormatter(stream_formatter)
-    # file handler
-    file_handler = logging.FileHandler(FILE_LOG)
-    file_formatter = logging.Formatter(FILE_LOG_FORMAT)
-    file_handler.setFormatter(file_formatter)
-    # add handlers
-    logger.addHandler(stream_handler)
-    logger.addHandler(file_handler)
+        # stream handler
+        stream_handler = logging.StreamHandler()
+        stream_formatter = logging.Formatter(STREAM_LOG_FORMAT)
+        stream_handler.setFormatter(stream_formatter)
+        # file handler
+        file_handler = logging.FileHandler(FILE_LOG)
+        file_formatter = logging.Formatter(FILE_LOG_FORMAT)
+        file_handler.setFormatter(file_formatter)
+        # add handlers
+        logger.addHandler(stream_handler)
+        logger.addHandler(file_handler)
 
-    # load modules
-    self.commands = self.objects_from_files(COMMANDS_DIR)
-    self.keywords = self.objects_from_files(PARSING_DIR)
+        # load modules
+        self.commands = self.objects_from_files(COMMANDS_DIR)
+        self.keywords = self.objects_from_files(PARSING_DIR)
 
     def objects_from_files(self, directory):
         """

@@ -28,6 +28,7 @@ class Parser:
         self.enabled = True
         self.bot = bot
         self.logger = logger
+        self.msg_formats = self.bot.transport.msg_formats
 
     def do_parse(self, msg, nick):
         """

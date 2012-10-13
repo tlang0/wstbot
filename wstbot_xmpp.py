@@ -22,42 +22,45 @@
 
 import logging
 from w_xmpp import WstXMPP
-#from wstbot import WstBot
+from wstbot import WstBot
+from wstbot_locals import STREAM_LOG_FORMAT
+from colors import XMPPFormats
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+# these settings will be used by sleekxmpp
+logging.basicConfig(level=logging.INFO, format=STREAM_LOG_FORMAT)
 
 def wstbot_load():
-    return WstBotXMPP("wstbot@dukgo.com", "aq1sw2", "hibforumtest@conference.dukgo.com", "wstbot")
+    return WstBotXMPP("wstbot@dukgo.com", "aq1sw2", "hibforum@conference.dukgo.com", "wstbot")
 
 class WstBotXMPP(WstXMPP):
 
     def __init__(self, *args):
         super().__init__(*args)
 
-#        self.wstbot = WstBot(self, debug=True)
+        self.msg_formats = XMPPFormats()
+        self.wstbot = WstBot(self, debug=True)
 
     def muc_message(self, msg):
         # ignore messages from self
         if msg["mucnick"] == self.nick:
             return
 
-        response = self.wstbot.handle_message(msg["body"], msg["from"].user)
-        logger.debug(response)
-        self.send_message(mto=msg["from"].bare, mbody=response, mtype="groupchat")
+        self.wstbot.handle_message(msg["from"].user, msg["body"])
 
     def muc_online(self, presence):
         # ignore own status changes
         if presence["muc"]["nick"] == self.nick:
             return
 
-        self.send_message(mto=presence["from"].bare, mbody="hi", mtype="groupchat")
+        #self.send_message(mto=presence["from"].bare, mbody="hi", mtype="groupchat")
+
+    def send_room_message(self, message):
+        self.send_message(mto=self.room, mbody=message, mtype="groupchat")
 
 if __name__ == "__main__":
-    logger.debug("start")
     bot = wstbot_load()
 
     if bot.connect():
         bot.process(block=True)
     else:
-        logger.error("Unable to connect")
+        logging.error("Unable to connect")

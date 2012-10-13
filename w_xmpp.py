@@ -23,8 +23,6 @@ import getpass
 import sleekxmpp
 from optparse import OptionParser
 
-logger = logging.getLogger(__name__)
-
 class WstXMPP(sleekxmpp.ClientXMPP):
 
     def __init__(self, jid, password, room, nick):
@@ -37,10 +35,10 @@ class WstXMPP(sleekxmpp.ClientXMPP):
         self.add_event_handler("groupchat_message", self.muc_message)
         self.add_event_handler("muc::{0}::got_online".format(self.room), self.muc_online)
 
-        self.register_plugin('xep_0030') # Service Discovery
-        self.register_plugin('xep_0045') # Multi-User Chat
-        self.MUC = self.plugin['xep_0045']
-        self.register_plugin('xep_0199') # XMPP Ping
+        self.register_plugin("xep_0030") # Service Discovery
+        self.register_plugin("xep_0045") # Multi-User Chat
+        self.MUC = self.plugin["xep_0045"]
+        self.register_plugin("xep_0199") # XMPP Ping
 
     def start(self, event):
         self.get_roster()
@@ -54,10 +52,3 @@ class WstXMPP(sleekxmpp.ClientXMPP):
     def muc_online(self, presence):
         pass
 
-if __name__ == "__main__":
-    bot = WstXMPP("wstbot@dukgo.com", "aq1sw2", "hibforum@conference.dukgo.com", "wstbot")
-    logging.basicConfig(level=logging.DEBUG, format="%(levelname)-8s %(message)s")
-    if bot.connect():
-        bot.process(block=True)
-    else:
-        print("unable to connect")
