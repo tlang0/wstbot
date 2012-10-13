@@ -17,8 +17,10 @@
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import wirc
 import os
 import importlib
 import configparser
@@ -48,32 +50,50 @@ NO_HELP_MSG = "There is no help message for this command!"
 
 logger = logging.getLogger(__name__)
 
-class WstBot:
+def wstbot_load(debug=False):
+    parser = configparser.SafeConfigParser()
+    parser.read("wstbot.conf")
 
-    def __init__(self, transport, debug=False):
+    server = parser.get("connection_data", "server")
+    port = int(parser.get("connection_data", "port"))
+    nick = parser.get("connection_data", "nick")
+    snick = parser.get("connection_data", "snick")
+    ident = parser.get("connection_data", "ident")
+    realname = parser.get("connection_data", "realname")
+    channel = parser.get("connection_data", "channel")
+    wstbot_server_port = int(parser.get("server_config", "port"))
+
+    return WstBot(server, nick, port, ident, realname, channel, server_port=wstbot_server_port, debug=debug)
+
+class WstBot(wirc.wIRC):
+
+    def __init__(self, server, nick, port, ident, realname, channel, 
+            server_port=8111, debug=False):
+        wirc.wIRC.__init__(self, server, nick, port, ident, realname, debug)
+        self.silent = False
+        self.chan = channel
+        self.server_port = server_port
+
         # initialize logger
-    if debug:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
+        if debug:
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.INFO)
+        # stream handler
+        stream_handler = logging.StreamHandler()
+        stream_formatter = logging.Formatter(STREAM_LOG_FORMAT)
+        stream_handler.setFormatter(stream_formatter)
+        # file handler
+        file_handler = logging.FileHandler(FILE_LOG)
+        file_formatter = logging.Formatter(FILE_LOG_FORMAT)
+        file_handler.setFormatter(file_formatter)
+        # add handlers
+        logger.addHandler(stream_handler)
+        logger.addHandler(file_handler)
 
-    self.transport = transport
-
-    # stream handler
-    stream_handler = logging.StreamHandler()
-    stream_formatter = logging.Formatter(STREAM_LOG_FORMAT)
-    stream_handler.setFormatter(stream_formatter)
-    # file handler
-    file_handler = logging.FileHandler(FILE_LOG)
-    file_formatter = logging.Formatter(FILE_LOG_FORMAT)
-    file_handler.setFormatter(file_formatter)
-    # add handlers
-    logger.addHandler(stream_handler)
-    logger.addHandler(file_handler)
-
-    # load modules
-    self.commands = self.objects_from_files(COMMANDS_DIR)
-    self.keywords = self.objects_from_files(PARSING_DIR)
+        # load modules
+        self.commands = self.objects_from_files(COMMANDS_DIR)
+        self.keywords = self.objects_from_files(PARSING_DIR)
 
     def objects_from_files(self, directory):
         """
@@ -109,6 +129,23 @@ class WstBot:
 
         return objects
 
+    # Send a formatted message
+    def formatted_msg(self, chan, msg, addcolor=True):
+        def sendline(line):
+            if line != "": # ignore empty lines
+                if addcolor:
+                    self.msg(chan, C.NORMAL + line)
+                else:
+                    self.msg(chan, line)
+                
+        if msg:
+            lines = msg.split("\n")
+            apply_seq(sendline, lines)
+                    
+    # Send a message to the current channel
+    def chanmsg(self, msg, addcolor=True):
+        self.formatted_msg(self.chan, msg, addcolor)
+
     def get_command_object(self, cmd):
         if cmd.strip() == "":
             return None
@@ -117,16 +154,22 @@ class WstBot:
                 return cmd_obj
         return None
 
-    def handle_message(self, nick, msg):    
+    # Handle privmsg
+    def on_privmsg(self, nick, ident, server, target, msg):    
         # parsing. accept direct messages too
         if msg is None:
-            logger.warning("msg was None")
+            logger.warning("on_privmsg: msg was None")
         if msg == "":
-            logger.warning("msg was empty")
+            logger.warning("on_privmsg: msg was empty")
         if msg[0] != "!":
             # check for keywords
             for cmd_obj in self.keywords:
-                self.send_room_message(cmd_obj.do_parse(msg, nick))
+                self.chanmsg(cmd_obj.do_parse(msg, nick))
+
+            return
+
+        # don't accept whispered and very short commands
+        if target != self.chan or len(msg) <= 2:
             return
 
         firstword = msg
@@ -149,37 +192,36 @@ class WstBot:
                 if cmd_obj:
                     help_msg = cmd_obj.get_help()
                     if help_msg is not None and help_msg.strip() != "":
-                        self.send_room_message(help_msg)
+                        self.chanmsg(help_msg)
                     else:
-                        self.send_room_message(NO_HELP_MSG)
+                        self.chanmsg(NO_HELP_MSG)
                         
             # general help
             else:
                 cmds = ""
                 for cmd in self.commands:
                     cmds += "!" + cmd.get_cmd() + ", "
-                self.send_room_message("Commands: " + cmds[:-2])
-                self.send_room_message("Also try !help [command] (without !)")
+                self.chanmsg("Commands: " + cmds[:-2])
+                self.chanmsg("Also try !help [command] (without !)")
         else:
             # check for command
             cmd_obj = self.get_command_object(ucmd)
             if cmd_obj:
-                self.send_room_message(cmd_obj.do_cmd(argstr, nick))
+                self.chanmsg(cmd_obj.do_cmd(argstr, nick))
 
-    def send_room_message(self, msg):
-        self.transport.send_room_message(msg)
-
+    # Joining a channel
     def on_me_join(self, channel):
         hello_msg = HELLOMSG.replace('#CHANNEL', channel)
-        self.send_room_message(hello_msg)
+        self.chanmsg(hello_msg)
         
+    # Someone else joins a channel
     def on_join(self, nick, ident, server):
         welcome_msg = WELCOMEMSG.replace("#NICK", nick)
         fortune_cmd_obj = self.get_command_object("fortune")
         if fortune_cmd_obj:
             fortune = fortune_cmd_obj.do_cmd("", nick)
             welcome_msg += " " + FORTUNEMSG.replace("#FORTUNE", fortune)
-        self.send_room_message(welcome_msg)
+        self.chanmsg(welcome_msg)
         
     # Handle all received data
     def on_receive(self, line):
@@ -187,3 +229,50 @@ class WstBot:
         if "End of" in line and "376" in line:
             self.join(self.chan)
 
+    def provide_special_options(self):
+        print("Commands: msg, join")
+        try:
+            command = input()
+            sp = command.find(" ")
+            c = command[:sp]
+            argstr = command[sp + 1:]
+
+            if c == "msg":
+                self.chanmsg(argstr)
+            elif c == "join":
+                self.part(self.chan)
+                self.join(argstr)
+                self.chan = argstr
+        except KeyboardInterrupt:
+            return -
+
+    def provide_special_options(self):
+        print("Commands: msg, join")
+        try:
+            command = input()
+            sp = command.find(" ")
+            c = command[:sp]
+            argstr = command[sp + 1:]
+
+            if c == "msg":
+                self.send_room_message(argstr)
+            elif c == "join":
+                self.part(self.chan)
+                self.join(argstr)
+                self.chan = argstr
+        except KeyboardInterrupt:
+            return -11
+
+if __name__ == '__main__':
+    wstbot = wstbot_load(debug=True)
+    wstbot.connect()
+
+    while True:
+        try:
+            wstbot.doirc()
+        except KeyboardInterrupt:
+            o = wstbot.provide_special_options()
+            if o == -1:
+                logger.info("bye!")
+                wstbot.quit()
+                break
