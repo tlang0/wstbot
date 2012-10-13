@@ -21,6 +21,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import configparser
 from w_xmpp import WstXMPP
 from wstbot import WstBot
 from wstbot_locals import STREAM_LOG_FORMAT
@@ -29,8 +30,18 @@ from colors import XMPPFormats
 # these settings will be used by sleekxmpp
 logging.basicConfig(level=logging.INFO, format=STREAM_LOG_FORMAT)
 
-def wstbot_load():
-    return WstBotXMPP("wstbot@dukgo.com", "aq1sw2", "hibforum@conference.dukgo.com", "wstbot")
+def wstbot_load(debug=False):
+    parser = configparser.SafeConfigParser()
+    parser.read("wstbot.conf")
+    
+    category = "xmpp_connection"
+
+    account = parser.get(category, "account")
+    password = parser.get(category, "password")
+    room = parser.get(category, "room")
+    nick = parser.get(category, "nick")
+
+    return WstBotXMPP(account, password, room, nick)
 
 class WstBotXMPP(WstXMPP):
 

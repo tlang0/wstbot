@@ -50,10 +50,6 @@ class C:
     PURPLE = chr(3) + "06"
     BOLD = chr(2)
 
-colors = {"default": C.NORMAL, "black": C.BLACK, "blue": C.BLUE, "green": C.GREEN, 
-        "red": C.RED, "purple": C.PURPLE}
-styles = {"default": C.NOFO, "bold": C.BOLD}
-
 class Formats:
 
     def get(self, format_name, message):

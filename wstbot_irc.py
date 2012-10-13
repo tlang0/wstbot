@@ -53,14 +53,16 @@ logger = logging.getLogger(__name__)
 def wstbot_load(debug=False):
     parser = configparser.SafeConfigParser()
     parser.read("wstbot.conf")
+    
+    category = "irc_connection"
 
-    server = parser.get("connection_data", "server")
-    port = int(parser.get("connection_data", "port"))
-    nick = parser.get("connection_data", "nick")
-    snick = parser.get("connection_data", "snick")
-    ident = parser.get("connection_data", "ident")
-    realname = parser.get("connection_data", "realname")
-    channel = parser.get("connection_data", "channel")
+    server = parser.get(category, "server")
+    port = int(parser.get(category, "port"))
+    nick = parser.get(category, "nick")
+    snick = parser.get(category, "snick")
+    ident = parser.get(category, "ident")
+    realname = parser.get(category, "realname")
+    channel = parser.get(category, "channel")
     wstbot_server_port = int(parser.get("server_config", "port"))
 
     return WstBot(server, nick, port, ident, realname, channel, server_port=wstbot_server_port, debug=debug)

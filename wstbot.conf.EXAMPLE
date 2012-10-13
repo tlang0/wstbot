@@ -1,4 +1,4 @@
-[connection_data]
+[irc_connection]
 server = irc.se.quakenet.org
 port = 6667
 nick = wstbot_
@@ -7,8 +7,12 @@ ident = WSTBOT
 realname = wIRC bot
 channel = #wstbottest
 
+[xmpp_connection]
+account = something@dukgo.com
+password = my_password
+room = someroom@conference.dukgo.com
+nick = wstbot
+
 [server_config]
 port = 8111
 address = http://localhost
-
-
