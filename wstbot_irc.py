@@ -46,23 +46,23 @@ def wstbot_load(debug=False):
     realname = parser.get(category, "realname")
     channel = parser.get(category, "channel")
 
-    return WstBotIRC(server, nick, port, ident, realname, channel)
+    return WstBotIRC(server, nick, port, ident, realname, channel, debug)
 
 class WstBotIRC(wirc.wIRC):
 
-    def __init__(self, server, nick, port, ident, realname, channel):
-        wirc.wIRC.__init__(self, server, nick, port, ident, realname, debug)
+    def __init__(self, server, nick, port, ident, realname, channel, debug=False):
+        super().__init__(server, nick, port, ident, realname, debug=debug)
         self.silent = False
         self.chan = channel
-        self.wstbot = WstBot(self, debug=True)
         self.msg_formats = IRCFormats()
+        self.wstbot = WstBot(self, debug=True)
 
     # Send a formatted message
     def formatted_msg(self, chan, msg, addcolor=True):
         def sendline(line):
             if line != "": # ignore empty lines
                 if addcolor:
-                    self.msg(chan, C.NORMAL + line)
+                    self.msg(chan, self.msg_formats.default_color(line))
                 else:
                     self.msg(chan, line)
                 

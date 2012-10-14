@@ -57,6 +57,12 @@ class Formats:
 
 class IRCFormats(Formats):
 
+    def default_color(self, message):
+        return C.NORMAL + message
+
+    def default_style(self, message):
+        return C.NOFO + message
+
     def black(self, message):
         return C.BLACK + message + C.NORMAL
 
