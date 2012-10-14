@@ -40,9 +40,9 @@ DEFAULTERROR = "An error occurred!"
 
 QUITMSG = "bye."
 HELPMSG = 'Type !help to see a list of commands.'
-HELLOMSG = 'Hello, #CHANNEL! ' + HELPMSG
-WELCOMEMSG = 'Hello, #NICK!'
-FORTUNEMSG = "Your fortune for today is:\n#FORTUNE"
+HELLOMSG = 'Hello, {channel}! ' + HELPMSG
+WELCOMEMSG = 'Hello, {nick}!'
+FORTUNEMSG = "Your fortune for today is:\n{fortune}"
 NO_HELP_MSG = "There is no help message for this command!"
 
 logger = logging.getLogger(__name__)
@@ -170,15 +170,15 @@ class WstBot:
         self.transport.send_room_message(msg)
 
     def on_me_join(self, channel):
-        hello_msg = HELLOMSG.replace('#CHANNEL', channel)
+        hello_msg = HELLOMSG.format(channel=channel)
         self.send_room_message(hello_msg)
         
-    def on_join(self, nick, ident, server):
-        welcome_msg = WELCOMEMSG.replace("#NICK", nick)
+    def on_join(self, nick):
+        welcome_msg = WELCOMEMSG.format(nick=nick)
         fortune_cmd_obj = self.get_command_object("fortune")
         if fortune_cmd_obj:
             fortune = fortune_cmd_obj.do_cmd("", nick)
-            welcome_msg += " " + FORTUNEMSG.replace("#FORTUNE", fortune)
+            welcome_msg += " " + FORTUNEMSG.format(fortune=fortune)
         self.send_room_message(welcome_msg)
         
     # Handle all received data

@@ -59,14 +59,18 @@ class WstBotXMPP(WstXMPP):
         self.wstbot.handle_message(msg["from"].user, msg["body"])
 
     def muc_online(self, presence):
-        # ignore own status changes
+        room_name = self.room_local_name(presence["muc"]["room"])
         if presence["muc"]["nick"] == self.nick:
-            return
-
-        #self.send_message(mto=presence["from"].bare, mbody="hi", mtype="groupchat")
+            self.wstbot.on_me_join(room_name)
+        else:
+            #self.wstbot.on_join(presence["muc"]["nick"])
+            pass
 
     def send_room_message(self, message):
         self.send_message(mto=self.room, mbody=message, mtype="groupchat")
+
+    def room_local_name(self, room_name):
+        return room_name[:room_name.find("@")]
 
 if __name__ == "__main__":
     bot = wstbot_load()
