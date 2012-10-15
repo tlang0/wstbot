@@ -66,9 +66,6 @@ class WstBotXMPP(WstXMPP):
             #self.wstbot.on_join(presence["muc"]["nick"])
             pass
 
-    def send_room_message(self, message):
-        self.send_message(mto=self.room, mbody=message, mtype="groupchat")
-
     def room_local_name(self, room_name):
         return room_name[:room_name.find("@")]
 

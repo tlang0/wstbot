@@ -52,3 +52,12 @@ class WstXMPP(sleekxmpp.ClientXMPP):
     def muc_online(self, presence):
         pass
 
+    def send_room_message(self, message, is_html=True):
+        if message is None:
+            return
+        if is_html:
+            html_message = "<span>" + message + "</span>"
+            self.send_message(mto=self.room, mbody=message, mhtml=html_message, mtype="groupchat")
+        else:
+            self.send_message(mto=self.room, mbody=message, mtype="groupchat")
+

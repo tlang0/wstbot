@@ -39,9 +39,9 @@ DEFAULTERROR = "An error occurred!"
 ##### MESSAGES ######
 
 QUITMSG = "bye."
-HELPMSG = 'Type !help to see a list of commands.'
-HELLOMSG = 'Hello, {channel}! ' + HELPMSG
-WELCOMEMSG = 'Hello, {nick}!'
+HELPMSG = "Type !help to see a list of commands."
+HELLOMSG = "Hello, {channel}! " + HELPMSG
+WELCOMEMSG = "Hello, {nick}!"
 FORTUNEMSG = "Your fortune for today is:\n{fortune}"
 NO_HELP_MSG = "There is no help message for this command!"
 

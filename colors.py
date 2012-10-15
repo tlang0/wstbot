@@ -17,6 +17,8 @@
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
+from functools import partial
+
 ###### IRC COLORS / FORMATTING ######
 
 #~ IRC Colors according to:
@@ -57,6 +59,9 @@ class Formats:
 
 class IRCFormats(Formats):
 
+    def default(self, message):
+        return C.NORMAL + message
+
     def default_color(self, message):
         return C.NORMAL + message
 
@@ -84,7 +89,19 @@ class IRCFormats(Formats):
 class XMPPFormats(Formats):
 
     def __getattr__(self, name):
-        return self.format
+        if name == "default_color" or name == "default_style":
+            return self.default
+        elif name in ["black", "blue", "green", "red", "purple"]:
+            return partial(self.colored, name)
 
-    def format(self, message):
+    def default(self, message):
         return message
+
+    def colored(self, color, message):
+        if color == "green":
+            color = "darkgreen"
+        return '<span style="color: {0};">{1}</span>'.format(color, message)
+
+    def bold(self, message):
+        return '<span style="font-weight: bold;">{0}</span>'.format(message)
+

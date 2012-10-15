@@ -24,7 +24,7 @@ class Lmgtfy(Command):
 
     def do(self, argstr, nick):
         if (argstr.strip() != ""):
-            bot.chanmsg("http://lmgtfy.com/?q={0}".format(argstr.replace(" ", "+").strip()))
+            return "http://lmgtfy.com/?q={0}".format(argstr.replace(" ", "+").strip())
 
     def get_cmd(self):
         return "lmgtfy"
