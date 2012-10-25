@@ -56,7 +56,14 @@ class WstBotXMPP(WstXMPP):
         if msg["mucnick"] == self.nick:
             return
 
-        self.wstbot.handle_message(msg["from"].user, msg["body"])
+        # debug output
+        #print("==================================================")
+        #b = bytearray(msg["body"], "utf-8")
+        #for orsch in b:
+        #    print(orsch)
+        #print("==================================================")
+
+        self.wstbot.handle_message(msg["from"].resource, msg["body"])
 
     def muc_online(self, presence):
         room_name = self.room_local_name(presence["muc"]["room"])

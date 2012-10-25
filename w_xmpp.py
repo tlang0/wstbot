@@ -22,6 +22,7 @@ import logging
 import getpass
 import sleekxmpp
 from optparse import OptionParser
+from xml.sax.saxutils import escape, unescape
 
 class WstXMPP(sleekxmpp.ClientXMPP):
 
@@ -55,9 +56,16 @@ class WstXMPP(sleekxmpp.ClientXMPP):
     def send_room_message(self, message, is_html=True):
         if message is None:
             return
+        message = self.prepare_message(message)
         if is_html:
             html_message = "<span>" + message + "</span>"
             self.send_message(mto=self.room, mbody=message, mhtml=html_message, mtype="groupchat")
         else:
             self.send_message(mto=self.room, mbody=message, mtype="groupchat")
+
+    def prepare_message(self, message):
+        new_message = message
+        new_message = escape(new_message);
+        new_message = new_message.replace("\n", "\n" + chr(0x2028))
+        return new_message
 

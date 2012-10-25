@@ -34,10 +34,9 @@ class Roll(Command):
         if maxroll > 0:
             try:
                 roll = random.choice(range(maxroll))
-                bot.chanmsg(nick + ' rolls ' + str(roll) + ' (0-' + str(maxroll) + ')')
+                return nick + " rolls " + str(roll) + " (0-" + str(maxroll) + ")"
             except:
                 self.logger.error("roll error!")
-
 
     def get_cmd(self):
         return "roll"

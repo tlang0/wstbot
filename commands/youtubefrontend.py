@@ -25,7 +25,7 @@ class Youtubefrontend(Command):
         argstr = argstr.strip()
 
         if not " " in argstr:
-            return
+            return self.get_help()
 
         spc = argstr.find(" ")
         user = argstr[:spc]
@@ -40,5 +40,5 @@ class Youtubefrontend(Command):
         return "youtube"
 
     def get_help(self):
-        return """!youtube <user> <option>\n<user>: The user account\n
-<option>: One of: relevance, published, viewCount, rating"""
+        return "!youtube <user> <option>\n<user>: The user account\n" + \
+            "<option>: One of: relevance, published, viewCount, rating"
