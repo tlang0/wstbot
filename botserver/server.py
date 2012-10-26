@@ -17,15 +17,25 @@
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
+import configparser
 from botserver import cherryserver
 
 class Server:
 
-    def __init__(self):
+    def __init__(self, port):
         self.dependency = "cherrypy"
+        self.port = port
         
-    def start(self, port):
-        cherryserver.start(port)
+    def start(self):
+        cherryserver.start(self.port)
+
+def load_server():
+    parser = configparser.SafeConfigParser()
+    parser.read("wstbot.conf")
+    category = "server_config"
+    port = parser.get(category, "port")
+    return Server(int(port))
 
 if __name__ == "__main__":
-    Server().start(8111)
+    server = load_server()
+    server.start()

@@ -21,6 +21,7 @@ import os
 import subprocess
 import cherrypy
 import time
+import configparser
 from string import Template
 from botserver.util import get_template_content
 
@@ -97,12 +98,22 @@ class ControlInterface:
         self.wstbot_server_proc = self.start_stop_process(self.wstbot_server_proc,
                 lambda : subprocess.Popen(["python3", "-m", "botserver.server"]))
         time.sleep(SLEEP_AMOUNT)
-        
+
 def main():
+    # load config
+    parser = configparser.SafeConfigParser()
+    parser.read("wstbot.conf")
+    category = "control_interface"
+    port = parser.get(category, "port")
+    port = int(port)
+
+    # apply config
     cherrypy.config.update({
-        "server.socket_port": PORT,
+        "server.socket_port": port,
         "server.socket_host": "0.0.0.0"
     })
+
+    # start server
     server = ControlInterface()
     cherrypy.tree.mount(server, "/")
     cherrypy.engine.start()
