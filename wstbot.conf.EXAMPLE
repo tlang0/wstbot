@@ -16,3 +16,6 @@ nick = wstbot
 [server_config]
 port = 8111
 address = http://localhost
+
+[control_interface]
+port = 8112
