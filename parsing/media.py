@@ -24,7 +24,7 @@ import re
 import json
 import urllib.request
 import html
-from util import str_list_to_int, parse_for_url
+from util import str_list_to_int, parse_for_url, download_page_decoded
 from parsing.parser import Parser
 from wstbot_locals import URL_REGEX_PREFIX
 
@@ -33,7 +33,6 @@ STORE_IMAGES = True
 STORE_YOUTUBE = True
 STORE_LINKS = True # meaning all other links
 
-WEB_ENCODING = "utf-8"
 MEDIA_PATH = os.path.join("data", "media")
 
 class Media(Parser):
@@ -112,7 +111,7 @@ class Media(Parser):
 
         def imgur(url):
             self.logger.info("found imgur url")
-            content = urllib.request.urlopen(url).read().decode(WEB_ENCODING)
+            content = download_page_decoded(url)
             match1 = re.search('<a href="(.*)" target="_blank">View full resolution', content)
             match2 = re.search('<link rel="image_src" href="(.*)"\s*/>', content)
             match = match1 or match2

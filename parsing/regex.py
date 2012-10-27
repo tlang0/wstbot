@@ -26,8 +26,8 @@ import html.parser
 import os
 import util
 from parsing.parser import Parser
+from wstbot_locals import WEB_ENCODING
 
-WEB_ENCODING = "utf-8"
 REGEX_FILE = os.path.join("data", "regex.yaml")
 
 class Regex(Parser):
@@ -82,13 +82,11 @@ class Regex(Parser):
             return
 
         try:
-            site = urllib.request.urlopen(url)
+            # retrieve content
+            content = util.download_page(url).decode(WEB_ENCODING, "replace")
         except:
             self.logger.warning("Error opening url!")
             return
-
-        # retrieve content
-        content = site.read().decode(WEB_ENCODING, "replace")
 
         message = None
 

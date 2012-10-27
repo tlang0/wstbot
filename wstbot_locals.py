@@ -19,7 +19,13 @@
 
 import os
 
+# regex bit to identify urls
 URL_REGEX_PREFIX = "(?:https?://)(?:www\.)?"
+
+# maximum download size for websites (bytes)
+WEB_READ_MAX = 1024 * 30 # 30kB
+# encoding for websites
+WEB_ENCODING = "utf-8"
 
 # log format strings
 STREAM_LOG_FORMAT = "[%(module)s] (%(levelname)s) %(message)s"

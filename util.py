@@ -18,7 +18,15 @@
 ########################################################################
 
 import re
+import urllib.request
 from wstbot_locals import URL_REGEX_PREFIX
+from wstbot_locals import WEB_READ_MAX, WEB_ENCODING
+
+def download_page_decoded(url):
+    return download_page(url).decode(WEB_ENCODING)
+
+def download_page(url):
+    return urllib.request.urlopen(url).read(WEB_READ_MAX)
 
 def parse_for_url(message):
     """Try to find a URL in the message."""
