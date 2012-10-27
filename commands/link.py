@@ -29,7 +29,7 @@ class Link(Command):
         parser.read("wstbot.conf")
         address = parser.get("server_config", "address")
         port = parser.get("server_config", "port")
-        web_interface_port = parser.get("web_interface", "port")
+        web_interface_port = parser.get("control_interface", "port")
         server_url = address + ":" + port
 
         argstr = argstr.strip()
