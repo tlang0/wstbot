@@ -32,6 +32,7 @@ from wstbot_locals import URL_REGEX_PREFIX
 STORE_IMAGES = True
 STORE_YOUTUBE = True
 STORE_LINKS = True # meaning all other links
+ITEMS_PER_PAGE = 15
 
 MEDIA_PATH = os.path.join("data", "media")
 
@@ -46,15 +47,25 @@ class Media(Parser):
             self.working = False
             return
 
+        self.items = 0
         self.working = True
         filelist = os.listdir(MEDIA_PATH) 
         filelist_int = str_list_to_int(filelist)
         if len(filelist_int) <= 0:
-            new_file_name = "1"
+            self.file_nr = 1
         else:
-            new_file_name = str(max(filelist_int) + 1)
+            self.file_nr = max(filelist_int) + 1
 
+        new_file_name = str(self.file_nr)
         self.logger.info("New media file: {0}".format(new_file_name))
+        self.update_file_path(new_file_name)
+
+    def check_page(self):
+        if self.items % ITEMS_PER_PAGE == 0:
+            self.file_nr += 1
+            self.update_file_path(str(self.file_nr))
+
+    def update_file_path(self, new_file_name):
         self.filepath = os.path.join(MEDIA_PATH, new_file_name)
         
     def parse(self, msg, nick):
@@ -81,6 +92,9 @@ class Media(Parser):
         with open(self.filepath, "a") as fp:
             json.dump(media_info_dict, fp)
             fp.write(os.linesep)
+
+        self.items += 1
+        self.check_page()
 
     def try_add_title(self, media_info_dict):
         """Try to find a description for the link using the regex module
