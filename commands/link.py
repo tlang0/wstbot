@@ -29,6 +29,7 @@ class Link(Command):
         parser.read("wstbot.conf")
         address = parser.get("server_config", "address")
         port = parser.get("server_config", "port")
+        web_interface_port = parser.get("web_interface", "port")
         server_url = address + ":" + port
 
         argstr = argstr.strip()
@@ -36,6 +37,8 @@ class Link(Command):
             return server_url + "/media"
         elif argstr == "regex" or argstr == "news":
             return server_url + "/regex"
+        elif argstr == "interface":
+            return address + ":" + web_interface_port
         else:
             return server_url + self.DEFAULT
     
