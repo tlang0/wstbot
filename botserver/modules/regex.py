@@ -62,6 +62,7 @@ class RegexUpdater:
         # make a backup
         try:
             os.mkdir(BACKUP_PATH)
+            os.mkdir(REGEX_BACKUP_PATH)
         except os.error:
             pass
 
