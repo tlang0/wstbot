@@ -126,7 +126,7 @@ class WstBot:
         if msg[0] != "!":
             # check for keywords
             for cmd_obj in self.keywords:
-                self.send_room_message(cmd_obj.do_parse(msg, nick))
+                self.send_room_message_formatted(cmd_obj.do_parse(msg, nick))
             return
 
         firstword = msg
@@ -142,6 +142,7 @@ class WstBot:
             return
         
         # !help command
+        # help messages should generally be unformatted
         if firstword == "!help":
             # try to get help for a specific command
             if " " in msg:
@@ -164,10 +165,13 @@ class WstBot:
             # check for command
             cmd_obj = self.get_command_object(ucmd)
             if cmd_obj:
-                self.send_room_message(cmd_obj.do_cmd(argstr, nick))
+                self.send_room_message_formatted(cmd_obj.do_cmd(argstr, nick))
 
     def send_room_message(self, msg):
         self.transport.send_room_message(msg)
+
+    def send_room_message_formatted(self, msg):
+        self.transport.send_room_message(msg, formatted=True)
 
     def on_me_join(self, channel):
         hello_msg = HELLOMSG.format(channel=channel)

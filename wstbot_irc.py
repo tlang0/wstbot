@@ -74,7 +74,8 @@ class WstBotIRC(wirc.wIRC):
     def chanmsg(self, msg, addcolor=True):
         self.formatted_msg(self.chan, msg, addcolor)
 
-    def send_room_message(self, message):
+    def send_room_message(self, message, formatted=True):
+        # there is no real difference between formatted and unformatted messages in irc
         self.chanmsg(message)
     
     # Handle privmsg

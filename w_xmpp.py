@@ -53,19 +53,16 @@ class WstXMPP(sleekxmpp.ClientXMPP):
     def muc_online(self, presence):
         pass
 
-    def send_room_message(self, message, is_html=True):
+    def send_room_message(self, message, formatted=False):
+        """formatted means that it is an html message"""
         if message is None:
             return
-        if is_html:
+        if formatted:
             html_message = "<span>" + message + "</span>"
             self.send_message(mto=self.room, mbody=message, mhtml=html_message, mtype="groupchat")
         else:
-            message = self.prepare_message(message)
-            self.send_message(mto=self.room, mbody=message, mtype="groupchat")
-
-    def prepare_message(self, message):
-        new_message = message
-        new_message = escape(new_message);
-        new_message = new_message.replace("\n", "\n" + chr(0x2028))
-        return new_message
+            # send every line seperately
+            lines = message.split("\n")
+            for line in lines:
+                self.send_message(mto=self.room, mbody=line, mtype="groupchat")
 
