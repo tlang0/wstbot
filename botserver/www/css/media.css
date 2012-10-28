@@ -2,6 +2,11 @@ body {
     text-align: center;
 }
 
+#escape {
+    width: 100%;
+    text-align: right;
+}
+
 .navigation {
     width: 30em;
     height: 1em;

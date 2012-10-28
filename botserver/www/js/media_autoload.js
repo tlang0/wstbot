@@ -1,6 +1,6 @@
-(function() {
+$(function() {
     $(document).scroll(function() {
-        if ($(window).scrollTop() + $(window).height() >= $(document).height() * 0.9) {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() * 0.98) {
             load_content();
         }
     });
@@ -13,4 +13,6 @@
         });
         $("#media-content").attr("data-page", page);
     }
-})();
+
+    $("#load-button").click(load_content);
+});

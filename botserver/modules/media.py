@@ -88,7 +88,7 @@ class MediaListBuilder:
         template = Template(html_template)
         
         htmldata = self.page(page)
-        new_html = template.substitute(media=htmldata, page=page)
+        new_html = template.substitute(media=htmldata, page=self.shown_page)
 
         return new_html
 
