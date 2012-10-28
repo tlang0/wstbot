@@ -1,6 +1,6 @@
 $(function() {
     $(document).scroll(function() {
-        if ($(window).scrollTop() + $(window).height() >= $(document).height() * 0.98) {
+        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
             load_content();
         }
     });
