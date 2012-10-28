@@ -16,6 +16,7 @@ $(function() {
         page = parseInt(page) - 1
         // reached the end?
         if (page <= 0) {
+            $("#load-button").hide();
             return;
         }
         $.get("/media/page/" + page, function(data) {
