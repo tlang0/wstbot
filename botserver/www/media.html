@@ -4,18 +4,12 @@
     <title>Wstbot media list</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
     <link rel="stylesheet" type="text/css" href="/css/media.css" />
+    <script src="/js/jquery-1.8.2.min.js"></script>
+    <script src="/js/media_autoload.js"></script>
   </head>
   <body>
-    <div class="navigation">
-      <div>${navprev}</div>
-      <div>${navnext}</div>
-    </div>
-    <hr class="nav-divider" />
+    <ul id="media-content" data-page="${page}">
 ${media}
-    <hr class="nav-divider" />
-    <div class="navigation">
-      <div>${navprev}</div>
-      <div>${navnext}</div>
-    </div>
+    </ul>
   </body>
 </html>

@@ -19,6 +19,7 @@
 
 import os
 import json
+import cherrypy
 from util import str_list_to_int
 from wstbot_locals import DATA_PATH, TEMPLATES_PATH
 from botserver.util import get_template_content
@@ -26,13 +27,14 @@ from string import Template
 
 # places newer entries on top if true
 MEDIA_PATH = os.path.join(DATA_PATH, "media")
+DEFAULT_FILE = "media.html"
+NOJS_FILE = "media-nojs.html"
 
 class MediaListBuilder:
     """Build an html media list from files containing the media URLs.
     In the html template, ${media} will be replaced by the list"""
 
-    def __init__(self, html_template):
-        self.html_template = html_template
+    def __init__(self):
         self.filelist = None
         self.pos_in_list = None
 
@@ -58,20 +60,54 @@ class MediaListBuilder:
         self.pos_in_list = self.filelist.index(self.shown_page)
         return os.path.join(MEDIA_PATH, self.shown_page)
 
-    def index(self, page=None, ascending=False):
+    @cherrypy.expose
+    def page(self, nr=None, ascending=False):
+        """Return page content, nothing more"""
+        page_path = self.load_pages(nr)
+        htmldata = ""
+
+        # read the media links and construct the page
+        with open(page_path, "r") as page_file:
+            media_list = page_file.readlines()
+            media_iter = iter(media_list) if ascending == True else reversed(media_list)
+
+            # insert media
+            for i, media_info_json in enumerate(media_iter):
+                # media_info should be a dict, in some versions it could be a list
+                media_info = json.loads(media_info_json)
+                media_info = self.media_info_to_dict(media_info)
+                htmldata += self.make_content_html(media_info)
+                if i < len(media_list) - 1:
+                    htmldata += "<hr />\n"
+
+        return htmldata
+
+    @cherrypy.expose
+    def index(self, page=None):
+        html_template = get_template_content(DEFAULT_FILE)
+        template = Template(html_template)
+        
+        htmldata = self.page(page)
+        new_html = template.substitute(media=htmldata, page=page)
+
+        return new_html
+
+    @cherrypy.expose
+    def nojs(self, page=None, ascending=False):
         try:
             ascending = bool(int(ascending))
         except:
             ascending = False
 
         htmldata = ""
-        template = Template(self.html_template)
+        html_template = get_template_content(NOJS_FILE)
+        template = Template(html_template)
 
         page_path = self.load_pages(page)
        
         def build_link(page):
             # copy the current get variables but use a different page number
-            link = "/media?page=" + str(page)
+            link = "/media/nojs?page=" + str(page)
             if ascending:
                 link += "&ascending=" + str(int(ascending))
             return link
@@ -81,33 +117,17 @@ class MediaListBuilder:
             list_index = (self.pos_in_list + nav) % len(self.filelist)
             return build_link(self.filelist[list_index])
 
-        # read the media links and construct the page
-        with open(page_path, "r") as page_file:
-            media_list = page_file.readlines()
-            media_iter = iter(media_list) if ascending == True else reversed(media_list)
-
-            # insert links to previous and next page
-            prev_html=""
-            next_html=""
-            if self.pos_in_list > 0:
-                prev_html += ('<a href="{0}" title="previous page">&lt;- previous page'
-                    + '</a>&nbsp;\n').format(build_navigation_link(-1))
-            if self.pos_in_list < len(self.filelist) - 1:
-                next_html += ('<a href="{0}" title="next page">next page -&gt;'
-                    + '</a>\n').format(build_navigation_link(1))
-
-            htmldata += "<ul>\n"
-
-            # insert media
-            for i, media_info_json in enumerate(media_iter):
-                # media_info should be a dict, in some versions it could be a list
-                media_info = json.loads(media_info_json)
-                media_info = self.media_info_to_dict(media_info)
-                htmldata += self.make_html(media_info)
-                if i < len(media_list) - 1:
-                    htmldata += "<hr />\n"
-            
-            htmldata += "</ul>\n"
+        # insert links to previous and next page
+        prev_html=""
+        next_html=""
+        if self.pos_in_list > 0:
+            prev_html += ('<a href="{0}" title="previous page">&lt;- previous page'
+                + '</a>&nbsp;\n').format(build_navigation_link(-1))
+        if self.pos_in_list < len(self.filelist) - 1:
+            next_html += ('<a href="{0}" title="next page">next page -&gt;'
+                + '</a>\n').format(build_navigation_link(1))
+        
+        htmldata = "<ul>\n" + self.page(page) + "\n</ul>"
 
         new_html = template.substitute(
                 navprev=prev_html,
@@ -121,7 +141,7 @@ class MediaListBuilder:
             return {"type": x[0], "url": x[1]}
         return x
 
-    def make_html(self, media_info):
+    def make_content_html(self, media_info):
         """media_info should be a dict"""
         url = media_info["url"]
         if url[-1] == os.linesep:
@@ -150,8 +170,6 @@ class MediaListBuilder:
         html_str += "</li>\n"
         return html_str
 
-    index.exposed = True
-
 def access():
-    builder = MediaListBuilder(get_template_content("media.html"))
+    builder = MediaListBuilder()
     return builder
