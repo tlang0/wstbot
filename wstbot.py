@@ -19,11 +19,9 @@
 
 # -*- coding: utf-8 -*-
 
-import os
-import importlib
 import configparser
 import logging
-from util import apply_seq
+from util import apply_seq, objects_from_files
 from wstbot_locals import STREAM_LOG_FORMAT, FILE_LOG_FORMAT
 
 ##### DIRECTORIES / FILE PATHS #####
@@ -71,43 +69,12 @@ class WstBot:
         logger.addHandler(stream_handler)
         logger.addHandler(file_handler)
 
+        # function to instantiate command and parsing objects (closure)
+        fi = lambda class_: class_(self, logger)
+
         # load modules
-        self.commands = self.objects_from_files(COMMANDS_DIR)
-        self.keywords = self.objects_from_files(PARSING_DIR)
-
-    def objects_from_files(self, directory):
-        """
-        1. Read files from a folder
-        2. Create objects from the classes contained in the files which should
-           have the same name as the file, with the first letter in upper case
-
-        """
-        
-        objects = []
-
-        # Load object objects
-        for objectfile in os.listdir(directory):
-            if objectfile[-2:] != "py" or objectfile[0] in [".", "_"]:
-                continue
-
-            objectclass = objectfile[0].upper() + objectfile[1:objectfile.rfind('.')]
-            objectmodule = objectclass.lower()
-
-            # omit templates (abstract classes)
-            if objectmodule == "command" or objectmodule == "parser":
-                continue
-
-            try:
-                logger.info("Importing object '" + objectclass + "'...")
-                module = importlib.import_module("{0}.{1}".format(directory, objectmodule))
-                class_ = getattr(module, objectclass)
-                obj = class_(self, logger)
-                objects.append(obj)
-            except ImportError as err:
-                logger.warning("Importing '{0}' from '{1}' was unsuccessful!".format(objectclass, objectfile))
-                logger.warning("Reason: {}".format(err))
-
-        return objects
+        self.commands = objects_from_files(COMMANDS_DIR, fi)
+        self.keywords = objects_from_files(PARSING_DIR, fi)
 
     def get_command_object(self, cmd):
         if cmd.strip() == "":
