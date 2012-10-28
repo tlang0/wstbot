@@ -20,9 +20,9 @@ $(function() {
         }
         $.get("/media/page/" + page, function(data) {
             $("#media-content").append(data);
+            $("#media-content").attr("data-page", page);
+            just_reached_bottom = false;
         });
-        $("#media-content").attr("data-page", page);
-        just_reached_bottom = false;
     }
 
     $("#load-button").click(load_content);
