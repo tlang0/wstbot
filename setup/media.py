@@ -34,11 +34,10 @@ class Media:
         self.setup_database()
 
     def setup_database(self):
-        conn = sqlite3.connect(MEDIA_DB_PATH)
-        cur = conn.cursor()
-        cur.execute(MEDIA_TABLE)
-        conn.commit()
-        conn.close()
+        with sqlite3.connect(MEDIA_DB_PATH) as conn:
+            cur = conn.cursor()
+            cur.execute(MEDIA_TABLE)
+            conn.commit()
 
 if __name__ == "__main__":
     Media().setup()

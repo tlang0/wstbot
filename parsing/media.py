@@ -24,6 +24,7 @@ import re
 import json
 import urllib.request
 import html
+import sqlite3
 from util import str_list_to_int, parse_for_url, download_page_decoded
 from parsing.parser import Parser
 from wstbot_locals import URL_REGEX_PREFIX
@@ -34,7 +35,7 @@ STORE_YOUTUBE = True
 STORE_LINKS = True # meaning all other links
 ITEMS_PER_PAGE = 15
 
-MEDIA_PATH = os.path.join("data", "media")
+MEDIA_DB_PATH = os.path.join("data", "media.db")
 
 class Media(Parser):
     """Parse for URLs that could be of interest and store them"""
@@ -42,36 +43,15 @@ class Media(Parser):
     def __init__(self, *args):
         super().__init__(*args)
 
-        if not os.path.exists(MEDIA_PATH):
-            self.logger.warning("Path does not exist: " + os.path.abspath(MEDIA_PATH))
-            self.working = False
+        if not os.path.exists(MEDIA_DB_PATH):
+            self.logger.warning("Path does not exist: " + os.path.abspath(MEDIA_DB_PATH))
+            self.enabled = False
             return
 
         self.items = 0
-        self.working = True
-        filelist = os.listdir(MEDIA_PATH) 
-        filelist_int = str_list_to_int(filelist)
-        if len(filelist_int) <= 0:
-            self.file_nr = 1
-        else:
-            self.file_nr = max(filelist_int) + 1
-
-        new_file_name = str(self.file_nr)
-        self.logger.info("New media file: {0}".format(new_file_name))
-        self.update_file_path(new_file_name)
-
-    def check_page(self):
-        if self.items % ITEMS_PER_PAGE == 0:
-            self.file_nr += 1
-            self.update_file_path(str(self.file_nr))
-
-    def update_file_path(self, new_file_name):
-        self.filepath = os.path.join(MEDIA_PATH, new_file_name)
         
     def parse(self, msg, nick):
-        if not self.working or msg[-1] == "*":
-            return
-
+        print("PARSING A LINK\n#########################")
         url = parse_for_url(msg)
         # no link found
         if url is None:
@@ -87,14 +67,18 @@ class Media(Parser):
 
         # try to find a title
         self.try_add_title(media_info_dict)
+        if not "title" in media_info_dict:
+            media_info_dict["title"] = ""
 
         # write
-        with open(self.filepath, "a") as fp:
-            json.dump(media_info_dict, fp)
-            fp.write(os.linesep)
+        with sqlite3.connect(MEDIA_DB_PATH) as conn:
+            cur = conn.cursor()
+            d = media_info_dict
+            cur.execute("insert into media (type, title, url) values (?, ?, ?)",
+                    (d["type"], d["title"], d["url"]))
+            conn.commit()
 
         self.items += 1
-        self.check_page()
 
     def try_add_title(self, media_info_dict):
         """Try to find a description for the link using the regex module
