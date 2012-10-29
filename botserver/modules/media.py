@@ -20,7 +20,6 @@
 import os
 import sqlite3
 import cherrypy
-from util import str_list_to_int
 from wstbot_locals import DATA_PATH, TEMPLATES_PATH
 from botserver.util import get_template_content
 from string import Template
