@@ -62,25 +62,24 @@ class Media(Parser):
         if media_info is None:
             self.logger.debug("media_info was None")
             return 
-
-        media_info_dict = {"type": media_info[0], "url": media_info[1]}
+        type_, url = media_info
 
         # try to find a title
-        self.try_add_title(media_info_dict)
-        if not "title" in media_info_dict:
-            media_info_dict["title"] = ""
+        title = self.try_get_title(type_, url)
+        if title is None:
+            title = ""
 
         # write
         with sqlite3.connect(MEDIA_DB_PATH) as conn:
             cur = conn.cursor()
             d = media_info_dict
             cur.execute("insert into media (type, title, url) values (?, ?, ?)",
-                    (d["type"], d["title"], d["url"]))
+                    (type_, title, url))
             conn.commit()
 
         self.items += 1
 
-    def try_add_title(self, media_info_dict):
+    def try_add_title(self, type_, url):
         """Try to find a description for the link using the regex module
         and add it to media_info_dict"""
         try:
@@ -89,13 +88,12 @@ class Media(Parser):
             return
 
         regex_parser = parsing.regex.Regex(self.bot, self.logger)
-        url = media_info_dict["url"]
-        if media_info_dict["type"] == "youtube":
+        if type_ == "youtube":
             url = "http://www.youtube.com/watch?v=" + url
         # get the resource name and title
         data = regex_parser.find_info(url, name_and_title=True)
         if data is not None:
-            media_info_dict["title"] = html.escape(data[1]) # title
+            return html.escape(data[1]) # title
 
     def parse_link(self, url):
         if not STORE_LINKS:
