@@ -21,7 +21,6 @@
 
 import os
 import re
-import json
 import urllib.request
 import html
 import sqlite3
@@ -51,7 +50,6 @@ class Media(Parser):
         self.items = 0
         
     def parse(self, msg, nick):
-        print("PARSING A LINK\n#########################")
         url = parse_for_url(msg)
         # no link found
         if url is None:
@@ -72,16 +70,15 @@ class Media(Parser):
         # write
         with sqlite3.connect(MEDIA_DB_PATH) as conn:
             cur = conn.cursor()
-            d = media_info_dict
             cur.execute("insert into media (type, title, url) values (?, ?, ?)",
                     (type_, title, url))
             conn.commit()
 
         self.items += 1
 
-    def try_add_title(self, type_, url):
+    def try_get_title(self, type_, url):
         """Try to find a description for the link using the regex module
-        and add it to media_info_dict"""
+        and return it"""
         try:
             import parsing.regex
         except ImportError:
