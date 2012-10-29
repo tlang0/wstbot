@@ -35,10 +35,10 @@ class MediaListBuilder:
     In the html template, ${media} will be replaced by the contents"""
 
     def __init__(self):
-        self.nr = 1
+        self.nr = 0
 
     @cherrypy.expose
-    def load(self, nr=1, ascending=False):
+    def load(self, nr=0, ascending=False):
         """Return items starting at nr"""
 
         self.nr = nr
@@ -55,13 +55,13 @@ class MediaListBuilder:
 
             # insert media
             for row in cur:
-                htmldata += self.make_content_html(row)
+                htmldata += self.make_content_html(id=row[0], type=row[1], title=row[2], url=row[3])
                 htmldata += "<hr />\n"
 
         return htmldata
 
     @cherrypy.expose
-    def index(self, nr=1, ascending=False):
+    def index(self, nr=0, ascending=False):
         html_template = get_template_content(DEFAULT_FILE)
         template = Template(html_template)
         
@@ -71,8 +71,8 @@ class MediaListBuilder:
         return new_html
 
     @cherrypy.expose
-    def nojs(self, nr=1):
-        if nr != 1:
+    def nojs(self, nr=0):
+        if nr != 0:
             nr = int(nr)
         htmldata = ""
         html_template = get_template_content(NOJS_FILE)
@@ -101,7 +101,7 @@ class MediaListBuilder:
 
         return new_html
 
-    def make_content_html(self, row):
+    def make_content_html(self, **row):
         """row should be a dict"""
         url = row["url"]
         if url[-1] == os.linesep:
