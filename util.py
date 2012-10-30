@@ -30,7 +30,11 @@ def download_page_decoded(url):
     return download_page(url).decode(WEB_ENCODING)
 
 def download_page(url):
-    return urllib.request.urlopen(url).read(WEB_READ_MAX)
+    try:
+        return urllib.request.urlopen(url).read(WEB_READ_MAX)
+    except:
+        logging.warning("Error opening url / downloading content!")
+        return None
 
 def parse_for_url(message):
     """Try to find a URL in the message."""

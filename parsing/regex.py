@@ -81,11 +81,9 @@ class Regex(Parser):
         if self.regexdata is None:
             return
 
-        try:
-            # retrieve content
-            content = util.download_page(url).decode(WEB_ENCODING, "replace")
-        except:
-            self.logger.warning("Error opening url!")
+        # retrieve content
+        content = util.download_page(url).decode(WEB_ENCODING, "replace")
+        if content is None:
             return
 
         message = None
@@ -129,9 +127,9 @@ class Regex(Parser):
             
         return message
 
-    def find_info(self, string, name_and_title=False):
-        """Find the wanted information using the regular expressions"""
-        r = self.patterns_for_url(string)
+    def find_info(self, message, name_and_title=False):
+        """Find information in the page whose url is contained in message."""
+        r = self.patterns_for_url(message)
         if r is None:
             return
         url, resource_dict = r
