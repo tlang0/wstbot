@@ -69,7 +69,7 @@ class WstBot:
         logger.addHandler(stream_handler)
         logger.addHandler(file_handler)
 
-        # function to instantiate command and parsing objects (closure)
+        # function to instantiate command and parsing objects
         instantiator = lambda class_: class_(self, logger)
 
         # load modules
