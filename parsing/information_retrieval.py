@@ -164,12 +164,8 @@ class Regex:
             logger.info("found info data: " + infodata)
             infodata = unescape(infodata)
 
-            title = infodata
-
-            if "replace" in info:
-                infodata = self.do_replace(infodata, info["replace"])
-
             infodata = infodata.strip()
+            title = infodata
                 
             if message is None:
                 message = ""
@@ -191,17 +187,6 @@ class Regex:
             return
         url, resource_dict = r
         return self.do_regex(url, resource_dict)
-            
-    def do_replace(self, message, replacements):
-        newmessage = message
-        for replacedata in replacements:
-            if not "needle" in replacedata or not "replacement" in replacedata:
-                logger.warning("replace: no needle or no replacement specified")
-            else:
-                newmessage = newmessage.replace(replacedata["needle"], replacedata["replacement"])
-
-        return newmessage
-
 
 class Media:
     """Parse for URLs that could be of interest and store them"""
