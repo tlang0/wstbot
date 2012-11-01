@@ -39,8 +39,8 @@ class Youtube(InformationSource):
         if match is None:
             return
 
-        logger.info("Found youtube video: " + self.video_id)
         self.video_id = match.group(1)
+        logger.info("Found youtube video: " + self.video_id)
 
         # find info
         content = download_page_decoded(url)

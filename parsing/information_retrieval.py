@@ -146,6 +146,7 @@ class Regex:
             return
 
         message = None
+        title = None
 
         for info in resource_dict["patterns"]:
             # try to find info
@@ -160,12 +161,13 @@ class Regex:
                 logger.warning("Found match but no groups")
                 break
 
-            infodata = match.groups()[0]
+            infodata = match.group(1)
             logger.info("found info data: " + infodata)
             infodata = unescape(infodata)
 
             infodata = infodata.strip()
-            title = infodata
+            if title is None:
+                title = infodata
                 
             if message is None:
                 message = ""
