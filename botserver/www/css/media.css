@@ -28,6 +28,11 @@ body {
     font-weight: bold;
 }
 
+.delete-button {
+    margin-left: 1em;
+    vertical-align: center;
+}
+
 img {
     clear: both;
     max-width: 1000px;

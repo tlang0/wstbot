@@ -20,12 +20,15 @@
 import os
 import sqlite3
 import cherrypy
-from wstbot_locals import DATA_PATH, TEMPLATES_PATH
+import shutil
+import time
+from wstbot_locals import DATA_PATH, TEMPLATES_PATH, BACKUP_PATH
 from botserver.util import get_template_content
 from string import Template
 
 # places newer entries on top if true
 MEDIA_DB_PATH = os.path.join(DATA_PATH, "media.db")
+BACKUP_DB_PATH = os.path.join(DATA_PATH, "media")
 DEFAULT_FILE = "media.html"
 NOJS_FILE = "media-nojs.html"
 ITEMS_PER_PAGE = 15
@@ -47,8 +50,6 @@ class MediaListBuilder:
 
         # get the media data and construct the page
         with sqlite3.connect(MEDIA_DB_PATH) as conn:
-            # make items accessible by name
-            conn.row_factory = sqlite3.Row
             cur = conn.cursor()
             cur.execute("select * from media order by id " + order + " limit ?, ?", 
                     (nr, ITEMS_PER_PAGE))
@@ -101,8 +102,34 @@ class MediaListBuilder:
 
         return new_html
 
+    def backup_db(self):
+        # make a backup
+        try:
+            os.mkdir(BACKUP_PATH)
+            os.mkdir(BACKUP_DB_PATH)
+        except os.error:
+            pass
+
+        shutil.copyfile(MEDIA_DB_PATH, os.path.join(BACKUP_DB_PATH, "media.db." + str(time.time())))
+
+    @cherrypy.expose
+    def delete(self, id_):
+        # backup db
+        try:
+            self.backup_db()
+        except:
+            return ""
+
+        # delete item with id_
+        with sqlite3.connect(MEDIA_DB_PATH) as conn:
+            cur = conn.cursor()
+            cur.execute("delete from media where id = ?", (id_,))
+
+        return id_
+
     def make_content_html(self, **row):
         """row should be a dict"""
+
         url = row["url"]
         if url[-1] == os.linesep:
             url = url[:-1]
@@ -112,6 +139,7 @@ class MediaListBuilder:
         title = ""
         if "title" in row:
             title = row["title"]
+
         # add the actual content
         if type_ == "link":
             if title == "":
@@ -131,7 +159,13 @@ class MediaListBuilder:
                     + 'frameborder="0" title="{1}" webkitAllowFullScreen mozallowfullscreen ' \
                     + 'allowFullScreen></iframe>').format(url, title)
         else:
-            return 'corrupted data'
+            return "Invalid type!\n"
+
+        html_str += "\n"
+
+        # add delete link
+        html_str += ('<a href="javascript:void(0);" title="delete" class="delete-button" id="{0}">' \
+                + '<img src="/img/delete.png" alt="delete" /></a>\n').format(row["id"])
 
         html_str += "</li>\n"
         return html_str

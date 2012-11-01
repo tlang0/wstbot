@@ -1,6 +1,7 @@
 $(function() {
     var ITEMS_PER_PAGE = 15;
     var just_reached_bottom = false;
+    var delete_button = $(".delete-button");
 
     $(document).scroll(function() {
         if (just_reached_bottom === true) {
@@ -31,4 +32,20 @@ $(function() {
     }
 
     $("#load-button").click(load_content);
+
+    delete_button.click(function() {
+        var button = $(this)
+        var id = button.attr("id");
+        var del = confirm("Delete item #" + id + "?");
+        if (del) {
+            $.post("/media/delete/" + id, function(data) {
+                if (data === id) {
+                    var parent_li = button.parent("li");
+                    parent_li.next("hr").remove();
+                    parent_li.remove();
+                }
+            });
+        }
+    });
+
 });
