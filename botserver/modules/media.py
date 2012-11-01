@@ -124,6 +124,12 @@ class MediaListBuilder:
                 html_str += '<div class="item-title">{0}</div>\n'.format(title)
             html_str += ('<iframe width="720" height="405" src="http://www.youtube.com/embed/{0}" ' \
                     + 'frameborder="0" title="{1}" allowfullscreen></iframe>').format(url, title)
+        elif type_ == "vimeo":
+            if title != "":
+                html_str += '<div class="item-title">{0}</div>\n'.format(title)
+            html_str += ('<iframe src="http://player.vimeo.com/video/{0}" width="720" height="405" ' \
+                    + 'frameborder="0" title="{1}" webkitAllowFullScreen mozallowfullscreen ' \
+                    + 'allowFullScreen></iframe>').format(url, title)
         else:
             return 'corrupted data'
 

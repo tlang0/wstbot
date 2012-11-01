@@ -18,47 +18,38 @@
 ########################################################################
 
 import logging
+import json
 import re
 from wstbot_locals import URL_REGEX_PREFIX
-from util import download_page_decoded
+from util import download_page
 from parsing.information_retrieval_sources.information_source import InformationSource
 
 logger = logging.getLogger("wstbot")
 
-class Youtube(InformationSource):
+class Vimeo(InformationSource):
 
     def __init__(self, *args):
         super().__init__(*args)
         self.video_id = None
 
     def find_info(self, url):
-        # valid youtube url?
-        match_normal = re.match(URL_REGEX_PREFIX + "youtube\.com/watch.*v=(\S{11})", url)
-        match_short = re.search(URL_REGEX_PREFIX + "youtu\.be/(\S+)", url)
-        match = match_normal or match_short
+        # get video id
+        match = re.match(URL_REGEX_PREFIX + 'vimeo\.com/(\S*)', url)
         if match is None:
             return
 
-        logger.info("Found youtube video: " + self.video_id)
         self.video_id = match.group(1)
+        logger.info("Found vimeo video: " + self.video_id)
 
-        # find info
-        content = download_page_decoded(url)
-        if content is None:
-            return
-
-        match_title = re.search('<meta property="og:title" content="(.+)"\s*>', content)
-        match_duration = re.search('<meta itemprop="duration" content="PT(.+)"\s*>', content)
-        if (match_title and match_duration) is None:
-            return
-
-        raw_title = match_title.group(1)
+        json_url = "http://vimeo.com/api/v2/video/{0}.json".format(self.video_id)
+        json_content = download_page(json_url).decode("utf-8")
+        json_data = json.loads(json_content)
+        json_data = json_data[0]
+    
+        raw_title = json_data["title"]
         title = self.msg_formats.bold(self.msg_formats.red(raw_title))
-        duration = match_duration.group(1)
-        duration = duration.replace("M", "m ")
-        duration = duration.replace("S", "s ")
-        duration = duration.replace("H", "h ")
-        duration = self.msg_formats.green(duration)
+        secs = int(json_data["duration"])
+        duration = self.msg_formats.green(str(int(secs / 60)) + "m " + str(secs % 60) + "s")
 
         message = "{0} :: {1}".format(title, duration)
 
@@ -66,8 +57,8 @@ class Youtube(InformationSource):
 
     def find_media_info(self, url):
         if self.video_id is not None:
-            return ("youtube", self.video_id)
+            return ("vimeo", self.video_id)
         else:
             return None
 
-CLASS_ = Youtube
+CLASS_ = Vimeo

@@ -25,11 +25,13 @@ class InformationSource:
 
     def find_info(self, url):
         """Retrieve a string of information that will be displayed by the bot
-        after the link was posted"""
+        after the link was posted.
+        Returns a tuple (information message, raw title)"""
         return None
 
     def find_media_info(self, url):
         """Find out the type of the media item (the type determines how it is
-        displayed on the web server media list"""
+        displayed on the web server media list.
+        Returns a tuple (type, url)"""
         return None
 
