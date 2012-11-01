@@ -22,10 +22,13 @@
 import re
 import os
 import urllib.request
+import logging
 from commands.command import Command
 
 WEB_ENCODING = "utf-8"
 FORTUNEDISABLED = "This category is currently disabled."
+
+logger = logging.getLogger("wstbot")
 
 class Fortune(Command):
     
@@ -40,7 +43,7 @@ class Fortune(Command):
         message = ""
         
         while True:
-            self.logger.info("Trying to get fortune message..")
+            logger.info("Trying to get fortune message..")
             
             if argstr.strip() != "":
                 message = self.fortune(argstr)

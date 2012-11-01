@@ -23,9 +23,11 @@ import re
 import logging
 import sqlite3
 from parsing.parser import Parser
-from util import (parse_for_url, unescape, get_directory_modules_objects, 
+from util import (parse_for_url, unescape, get_modules_objects, 
                   first, chain_call, download_page, download_page_decoded)
 from wstbot_locals import WEB_ENCODING, URL_REGEX_PREFIX
+
+logger = logging.getLogger("wstbot")
 
 # paths
 MEDIA_DB_PATH = os.path.join("data", "media.db")
@@ -46,11 +48,11 @@ class InformationRetrieval(Parser):
         self.media = self.init_media()
         self.regex = Regex(self.msg_formats)
 
-        self.sources = get_directory_modules_objects(SOURCES_PATH)
+        self.sources = get_modules_objects(SOURCES_PATH)
 
     def init_media(self):
         if not os.path.exists(MEDIA_DB_PATH):
-            logging.warning("Path does not exist: {0}. Did you forget to run the setup?"
+            logger.warning("Path does not exist: {0}. Did you forget to run the setup?"
                     .format(os.path.abspath(MEDIA_DB_PATH)))
             return None
         return Media(self.msg_formats)
@@ -90,14 +92,14 @@ class Regex:
             try:
                 match = re.search(resource_dict["url pattern"], url)
             except:
-                logging.warning("bad regex: " + resource_dict["url pattern"])
+                logger.warning("bad regex: " + resource_dict["url pattern"])
                 continue
             if not match:
                 continue
 
             url = match.group(1)
-            logging.info("Found information from " + resource_dict["name"] + "!")
-            logging.info("url: " + url)
+            logger.info("Found information from " + resource_dict["name"] + "!")
+            logger.info("url: " + url)
 
             return (url, resource_dict)
 
@@ -127,17 +129,17 @@ class Regex:
             # try to find info
             match = re.search(info["pattern"], content)
             if match is None:
-                logging.warning("Could not find info! (match == None)")
+                logger.warning("Could not find info! (match == None)")
                 break
             if match.groups() is None:
-                logging.warning("match.groups() was None")
+                logger.warning("match.groups() was None")
                 break
             if len(match.groups()) <= 0:
-                logging.warning("Found match but no groups")
+                logger.warning("Found match but no groups")
                 break
 
             infodata = match.groups()[0]
-            logging.info("found info data: " + infodata)
+            logger.info("found info data: " + infodata)
             infodata = unescape(infodata)
 
             # name and title
@@ -175,7 +177,7 @@ class Regex:
         newmessage = message
         for replacedata in replacements:
             if not "needle" in replacedata or not "replacement" in replacedata:
-                logging.warning("replace: no needle or no replacement specified")
+                logger.warning("replace: no needle or no replacement specified")
             else:
                 newmessage = newmessage.replace(replacedata["needle"], replacedata["replacement"])
 
@@ -192,7 +194,7 @@ class Media:
         media_info = chain_call(url, [self.parse_image, self.parse_youtube, self.parse_link])
         # something went wrong
         if media_info is None:
-            logging.debug("media_info was None")
+            logger.debug("media_info was None")
             return 
         type_, url = media_info
 
@@ -217,13 +219,13 @@ class Media:
             return None
 
         def imgur(url):
-            logging.info("found imgur url")
+            logger.info("found imgur url")
             content = download_page_decoded(url)
             match1 = re.search('<a href="(.*)" target="_blank">View full resolution', content)
             match2 = re.search('<link rel="image_src" href="(.*)"\s*/>', content)
             match = match1 or match2
             if match:
-                logging.info("imgur match")
+                logger.info("imgur match")
                 imageurl = match.group(1)
                 if imageurl:
                     return imageurl
@@ -239,7 +241,7 @@ class Media:
         if match is None and imgurmatch is None:
             return None
 
-        logging.info("Found image url: " + url)
+        logger.info("Found image url: " + url)
         return ("image", url)
 
     def parse_youtube(self, url):
@@ -253,7 +255,7 @@ class Media:
             return
         video_id = match.group(1)
 
-        logging.info("Found youtube video: " + video_id)
+        logger.info("Found youtube video: " + video_id)
         return ("youtube", video_id)
 
 CLASS_ = InformationRetrieval

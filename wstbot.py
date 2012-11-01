@@ -21,7 +21,7 @@
 
 import configparser
 import logging
-from util import apply_seq, get_directory_modules_objects
+from util import apply_seq, get_modules_objects
 from wstbot_locals import STREAM_LOG_FORMAT, FILE_LOG_FORMAT
 
 ##### DIRECTORIES / FILE PATHS #####
@@ -43,19 +43,19 @@ WELCOMEMSG = "Hello, {nick}!"
 FORTUNEMSG = "Your fortune for today is:\n{fortune}"
 NO_HELP_MSG = "There is no help message for this command!"
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("wstbot")
 logger.propagate = False
 
 class WstBot:
 
     def __init__(self, transport, debug=False):
-        # initialize logger
+        self.transport = transport
+
+        # initialize logging
         if debug:
             logger.setLevel(logging.DEBUG)
         else:
             logger.setLevel(logging.INFO)
-
-        self.transport = transport
 
         # stream handler
         stream_handler = logging.StreamHandler()
@@ -68,13 +68,13 @@ class WstBot:
         # add handlers
         logger.addHandler(stream_handler)
         logger.addHandler(file_handler)
-
+        
         # function to instantiate command and parsing objects
-        instantiator = lambda class_: class_(self, logger)
+        instantiator = lambda class_: class_(self)
 
         # load modules
-        self.commands = get_directory_modules_objects(COMMANDS_DIR, f=instantiator)
-        self.keywords = get_directory_modules_objects(PARSING_DIR, f=instantiator)
+        self.commands = get_modules_objects(COMMANDS_DIR, f=instantiator)
+        self.keywords = get_modules_objects(PARSING_DIR, f=instantiator)
 
     def get_command_object(self, cmd):
         if cmd.strip() == "":

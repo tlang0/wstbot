@@ -18,7 +18,10 @@
 ########################################################################
 
 import random
+import logging
 from commands.command import Command
+
+logger = logging.getLogger("wstbot")
 
 class Roll(Command):
 
@@ -29,14 +32,14 @@ class Roll(Command):
             try:
                 maxroll = int(argstr.strip())
             except:
-                self.logger.warning("rolling: given argument is not an integer")
+                logger.warning("rolling: given argument is not an integer")
                
         if maxroll > 0:
             try:
                 roll = random.choice(range(maxroll))
                 return nick + " rolls " + str(roll) + " (0-" + str(maxroll) + ")"
             except:
-                self.logger.error("roll error!")
+                logger.error("roll error!")
 
     def get_cmd(self):
         return "roll"

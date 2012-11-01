@@ -19,9 +19,9 @@
 
 class InformationSource:
 
-    def retrieve_information(self):
+    def retrieve_information(self, url):
         return None
 
-    def store_media(self):
+    def store_media(self, url):
         return None
 

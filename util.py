@@ -26,6 +26,8 @@ import glob
 import html.parser
 from wstbot_locals import WEB_READ_MAX, WEB_ENCODING, URL_REGEX_PREFIX
 
+logger = logging.getLogger("wstbot")
+
 def unescape(message):
     parser = html.parser.HTMLParser()
     return parser.unescape(message)
@@ -37,7 +39,7 @@ def download_page(url):
     try:
         return urllib.request.urlopen(url).read(WEB_READ_MAX)
     except:
-        logging.warning("Error opening url / downloading content!")
+        logger.warning("Error opening url / downloading content!")
         return None
 
 def parse_for_url(message):
@@ -107,11 +109,11 @@ def get_modules(path):
             continue
 
         try:
-            logging.info("Importing module '" + module_name + "'...")
+            logger.info("Importing module '" + module_name + "'...")
             modules.append(importlib.import_module("." + module_name, module_path))
         except ImportError as err:
-            logging.warning("Importing '{0}' was unsuccessful!".format(module_path + "." + module_name))
-            logging.warning("Reason: {0}".format(err))
+            logger.warning("Importing '{0}' was unsuccessful!".format(module_path + "." + module_name))
+            logger.warning("Reason: {0}".format(err))
 
     return modules
 
@@ -138,6 +140,6 @@ def get_modules_objects(path, f=lambda x: x(), getter="get"):
             if class_ is not None:
                 results.append(f(class_))
             else:
-                logging.warning("Nothing to instantiate in {}!".format(module.__name__))
+                logger.warning("Nothing to instantiate in {}!".format(module.__name__))
 
     return results

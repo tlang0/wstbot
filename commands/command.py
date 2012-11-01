@@ -20,14 +20,13 @@
 class Command:
     """Base class for commands"""
 
-    def __init__(self, bot, logger):
+    def __init__(self, bot):
         """Initialize module"""
         if bot is None:
             self.enabled = False
             return
         self.enabled = True
         self.bot = bot
-        self.logger = logger
         self.msg_formats = self.bot.transport.msg_formats
 
     def do_cmd(self, argstr, nick):
