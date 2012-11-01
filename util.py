@@ -23,8 +23,12 @@ import re
 import urllib.request
 import importlib
 import glob
-from wstbot_locals import URL_REGEX_PREFIX
-from wstbot_locals import WEB_READ_MAX, WEB_ENCODING
+import html.parser
+from wstbot_locals import WEB_READ_MAX, WEB_ENCODING, URL_REGEX_PREFIX
+
+def unescape(message):
+    parser = html.parser.HTMLParser()
+    return parser.unescape(message)
 
 def download_page_decoded(url):
     return download_page(url).decode(WEB_ENCODING)
@@ -44,10 +48,29 @@ def parse_for_url(message):
         return match.group(0)
     return None
 
+def first(sequence):
+    """Returns the first encountered element in the sequence that is not None."""
+    if sequence is None:
+        return None
+    for e in sequence:
+        if e is not None:
+            return e
+    return None
+
+def chain_call(value, functions):
+    """Calls every function in functions with the value and returns the first result
+    that is not None. Returns None if all functions returned None."""
+    for f in functions:
+        r = f(value)
+        if r is not None:
+            break
+    return None
+
+
 def apply_seq(function, sequence):
     """Applies a function to every element of the sequence"""
-    for item in sequence: 
-        function(item)
+    for e in sequence: 
+        function(e)
 
 def str_list_to_int(l):
     """Converts a list of strings to a list of integers"""
@@ -80,12 +103,11 @@ def get_directory_modules(directory):
         if module_name[1] == "_":
             continue
 
-        module_path = "{}.{}".format(directory, module_name)
         try:
             logging.info("Importing module '" + module_name + "'...")
-            modules.append(importlib.import_module(module_path))
+            modules.append(importlib.import_module(module_name, directory))
         except ImportError as err:
-            logging.warning("Importing '{0}' was unsuccessful!".format(module_path))
+            logging.warning("Importing '{0}' was unsuccessful!".format(directory + "." + module_name))
             logging.warning("Reason: {}".format(err))
 
     return modules

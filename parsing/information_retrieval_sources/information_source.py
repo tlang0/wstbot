@@ -17,18 +17,11 @@
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
-from util import get_directory_modules_objects
+class InformationSource:
 
-SETUP_DIR = "setup"
+    def retrieve_information(self):
+        return None
 
-def setup():
-    """Call all setup modules"""
-    setup_objects = get_directory_modules_objects(SETUP_DIR)
-    for setup in setup_objects:
-        print("Setting up {0}...".format(setup.__class__.__name__))
-        setup.setup()
+    def store_media(self):
+        return None
 
-    print("Setup complete!")
-
-if __name__ == "__main__":
-    setup()
