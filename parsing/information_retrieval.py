@@ -46,6 +46,8 @@ class InformationRetrieval(Parser):
         self.media = self.init_media()
         self.regex = Regex(self.msg_formats)
 
+        self.sources = get_directory_modules_objects(SOURCES_PATH)
+
     def init_media(self):
         if not os.path.exists(MEDIA_DB_PATH):
             logging.warning("Path does not exist: {0}. Did you forget to run the setup?"
@@ -58,10 +60,8 @@ class InformationRetrieval(Parser):
         if url is None:
             return
 
-        sources = get_directory_modules_objects(SOURCES_PATH)
-
         # try to find info by using the source modules
-        info_from_modules = lambda: first((source.retrieve_information(url) for source in sources))
+        info_from_modules = lambda: first((source.retrieve_information(url) for source in self.sources))
         # find infos using regex patterns
         info_from_regex = lambda: self.regex.find_info(url)
         # try them in order; if the first one succeeds, the second one is not called

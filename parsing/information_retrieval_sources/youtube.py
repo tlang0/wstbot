@@ -17,7 +17,7 @@
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
-from information_source import InformationSource
+from parsing.information_retrieval_sources.information_source import InformationSource
 
 class Youtube(InformationSource):
 

@@ -85,15 +85,18 @@ def str_list_to_int(l):
 
     return new_list
 
-def get_directory_modules(directory):
-    """Return a list of python modules in a directory. 
+def get_modules(path):
+    """Return a list of python modules in a given path. 
     Files not ending with '.py' are ignored. 
     May throw an OSError."""
 
     modules = []
 
+    module_path = path.replace(os.sep, ".")
+    importlib.import_module(module_path)
+
     # get file names
-    filenames = glob.glob(os.path.join(directory, "*.py"))
+    filenames = glob.glob(os.path.join(path, "*.py"))
     filenames = (os.path.basename(x) for x in filenames)
     # get module names
     module_names = (os.path.splitext(x)[0] for x in filenames)
@@ -105,15 +108,15 @@ def get_directory_modules(directory):
 
         try:
             logging.info("Importing module '" + module_name + "'...")
-            modules.append(importlib.import_module(module_name, directory))
+            modules.append(importlib.import_module("." + module_name, module_path))
         except ImportError as err:
-            logging.warning("Importing '{0}' was unsuccessful!".format(directory + "." + module_name))
-            logging.warning("Reason: {}".format(err))
+            logging.warning("Importing '{0}' was unsuccessful!".format(module_path + "." + module_name))
+            logging.warning("Reason: {0}".format(err))
 
     return modules
 
-def get_directory_modules_objects(directory, f=lambda x: x(), getter="get"):
-    """Get all modules from a directory (see get_directory_modules), call a function
+def get_modules_objects(path, f=lambda x: x(), getter="get"):
+    """Get all modules from a path (see get_modules), call a function
     in each of them and return its results. The getter function is 'get' by wstbot convention
     and the results are usually objects, therefore the name of this function.
 
@@ -123,7 +126,7 @@ def get_directory_modules_objects(directory, f=lambda x: x(), getter="get"):
     to instantiate it using f."""
 
     results = []
-    modules = get_directory_modules(directory)
+    modules = get_modules(path)
     for module in modules:
         # try to call the getter function
         func = getattr(module, getter, None)
