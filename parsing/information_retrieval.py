@@ -18,6 +18,7 @@
 ########################################################################
 
 import os
+import os.path
 import yaml
 import re
 import logging
@@ -96,15 +97,24 @@ class Regex:
     def __init__(self, msg_formats):
         self.regexdata = None
         self.msg_formats = msg_formats
+        self.mtime = None
+        self.load_yaml_regex()
+
+    def load_yaml_regex(self):
+        mtime = os.path.getmtime(REGEX_FILE_PATH)
+        if self.mtime is None or mtime > self.mtime:
+            # load regex strings
+            with open(REGEX_FILE_PATH, "r") as regex_file:
+                self.regexdata = yaml.safe_load(regex_file)
+            self.mtime = os.path.getmtime(REGEX_FILE_PATH)
 
     def patterns_for_url(self, url):
         """Get the information dict from the yaml file for the url contained in msg.
         Returns a tuple (url, resource_dict) where info is the yaml dict"""
 
-        # load regex strings
-        with open(REGEX_FILE_PATH, "r") as regex_file:
-            self.regexdata = yaml.safe_load(regex_file)
-        
+        # reload regex data if it has changed
+        self.load_yaml_regex()
+                
         for resource_dict in self.regexdata["sources"]:
             try:
                 match = re.search(resource_dict["url pattern"], url)
