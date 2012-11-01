@@ -65,9 +65,8 @@ def chain_call(value, functions):
     for f in functions:
         r = f(value)
         if r is not None:
-            break
+            return r
     return None
-
 
 def apply_seq(function, sequence):
     """Applies a function to every element of the sequence"""
@@ -140,6 +139,6 @@ def get_modules_objects(path, f=lambda x: x(), getter="get"):
             if class_ is not None:
                 results.append(f(class_))
             else:
-                logger.warning("Nothing to instantiate in {}!".format(module.__name__))
+                logger.info("Omitting {0}.".format(module.__name__))
 
     return results

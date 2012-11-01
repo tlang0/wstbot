@@ -62,15 +62,31 @@ class InformationRetrieval(Parser):
         if url is None:
             return
 
+        source = None
+
+        def info_from_sources():
+            for s in self.sources:
+                info = s.retrieve_information(url)
+                if info is not None:
+                    source = s
+                    return info
+            return None
+
         # try to find info by using the source modules
-        info_from_modules = lambda: first((source.retrieve_information(url) for source in self.sources))
+        info_from_modules = lambda: info_from_sources()
         # find infos using regex patterns
         info_from_regex = lambda: self.regex.find_info(url)
         # try them in order; if the first one succeeds, the second one is not called
         info = info_from_modules() or info_from_regex() 
 
         # store media
-        self.media.store_media(url, title=info)
+        if source is not None:
+            # use the media handler of the object that was used for information retrieval
+            type_, url = source.get_media_info(url)
+            self.media.store_media(url, title=info, type_=type_)
+        else:
+            # use the builtin media handlers
+            self.media.store_media(url, title=info)
 
         return info
 
@@ -190,13 +206,14 @@ class Media:
     def __init__(self, msg_formats):
         self.msg_formats = msg_formats
         
-    def store_media(self, url, title=None):
-        media_info = chain_call(url, [self.parse_image, self.parse_youtube, self.parse_link])
-        # something went wrong
-        if media_info is None:
-            logger.debug("media_info was None")
-            return 
-        type_, url = media_info
+    def store_media(self, url, title=None, type_=None):
+        if type_ is None:
+            # try the builtin types
+            media_info = chain_call(url, [self.parse_image, self.parse_youtube, self.parse_link])
+            if media_info is None:
+                logger.warning("media was not stored")
+                return 
+            type_, url = media_info
 
         if title is None:
             title = ""

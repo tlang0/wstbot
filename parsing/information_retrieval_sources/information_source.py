@@ -22,6 +22,6 @@ class InformationSource:
     def retrieve_information(self, url):
         return None
 
-    def store_media(self, url):
+    def get_media_info(self, url):
         return None
 
