@@ -17,10 +17,55 @@
 # along with wstbot.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
+import logging
+import re
+from wstbot_locals import URL_REGEX_PREFIX
+from util import download_page_decoded
 from parsing.information_retrieval_sources.information_source import InformationSource
+
+logger = logging.getLogger("wstbot")
 
 class Youtube(InformationSource):
 
-    pass
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.video_id = None
+
+    def find_info(self, url):
+        # valid youtube url?
+        match_normal = re.match(URL_REGEX_PREFIX + "youtube\.com/watch.*v=(\S{11})", url)
+        match_short = re.search(URL_REGEX_PREFIX + "youtu\.be/(\S+)", url)
+        match = match_normal or match_short
+        if match is None:
+            return
+
+        self.video_id = match.group(1)
+
+        # find info
+        content = download_page_decoded(url)
+        if content is None:
+            return
+
+        match_title = re.search('<meta property="og:title" content="(.+)"\s*>', content)
+        match_duration = re.search('<meta itemprop="duration" content="PT(.+)"\s*>', content)
+        if (match_title and match_duration) is None:
+            return
+
+        raw_title = match_title.group(1)
+        title = self.msg_formats.bold(self.msg_formats.red(raw_title))
+        duration = match_duration.group(1)
+        duration = duration.replace("M", "m ")
+        duration = duration.replace("S", "s ")
+        duration = duration.replace("H", "h ")
+        duration = self.msg_formats.green(duration)
+
+        return ("{0} :: {1}".format(title, duration), raw_title)
+
+    def find_media_info(self, url):
+        if self.video_id is not None:
+            logger.info("Found youtube video: " + self.video_id)
+            return ("youtube", self.video_id)
+        else:
+            return None
 
 CLASS_ = Youtube

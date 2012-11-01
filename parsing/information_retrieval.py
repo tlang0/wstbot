@@ -48,7 +48,7 @@ class InformationRetrieval(Parser):
         self.media = self.init_media()
         self.regex = Regex(self.msg_formats)
 
-        self.sources = get_modules_objects(SOURCES_PATH)
+        self.sources = get_modules_objects(SOURCES_PATH, f=lambda x: x(self.bot))
 
     def init_media(self):
         if not os.path.exists(MEDIA_DB_PATH):
@@ -65,8 +65,9 @@ class InformationRetrieval(Parser):
         source = None
 
         def info_from_sources():
+            nonlocal source
             for s in self.sources:
-                info = s.retrieve_information(url)
+                info = s.find_info(url)
                 if info is not None:
                     source = s
                     return info
@@ -77,16 +78,16 @@ class InformationRetrieval(Parser):
         # find infos using regex patterns
         info_from_regex = lambda: self.regex.find_info(url)
         # try them in order; if the first one succeeds, the second one is not called
-        info = info_from_modules() or info_from_regex() 
+        info, title = info_from_modules() or info_from_regex() 
 
         # store media
         if source is not None:
             # use the media handler of the object that was used for information retrieval
-            type_, url = source.get_media_info(url)
-            self.media.store_media(url, title=info, type_=type_)
+            type_, url = source.find_media_info(url)
+            self.media.store_media(url, title=title, type_=type_)
         else:
             # use the builtin media handlers
-            self.media.store_media(url, title=info)
+            self.media.store_media(url, title=title)
 
         return info
 
@@ -119,16 +120,12 @@ class Regex:
 
             return (url, resource_dict)
 
-    def do_regex(self, url, resource_dict, name_and_title=False):
+    def do_regex(self, url, resource_dict):
         """Downloads the URL's content, searches for the regular expressions
         and builds a message out of the matched data.
 
         Arguments: resource_dict contains the patterns and additional data for
         the url.
-
-        If name_and_title is set, only the name and the result of the first
-        pattern match (wich is usually the title of the article) will be 
-        returned: (name, title)
         """
 
         if self.regexdata is None:
@@ -158,9 +155,7 @@ class Regex:
             logger.info("found info data: " + infodata)
             infodata = unescape(infodata)
 
-            # name and title
-            if name_and_title:
-                return (resource_dict["name"], infodata)
+            title = infodata
 
             if "replace" in info:
                 infodata = self.do_replace(infodata, info["replace"])
@@ -178,16 +173,15 @@ class Regex:
         if message is not None and message.strip()[-len(sep):] == sep:
             message = message.strip()[:-len(sep)].strip()
             
-        return message
+        return message, title
 
-    def find_info(self, url, name_and_title=False):
+    def find_info(self, url):
         """Find information in the page at the specified url."""
         r = self.patterns_for_url(url)
         if r is None:
             return
         url, resource_dict = r
-        output = self.do_regex(url, resource_dict, name_and_title=name_and_title)
-        return output
+        return self.do_regex(url, resource_dict)
             
     def do_replace(self, message, replacements):
         newmessage = message
@@ -209,7 +203,7 @@ class Media:
     def store_media(self, url, title=None, type_=None):
         if type_ is None:
             # try the builtin types
-            media_info = chain_call(url, [self.parse_image, self.parse_youtube, self.parse_link])
+            media_info = chain_call(url, [self.parse_image, self.parse_link])
             if media_info is None:
                 logger.warning("media was not stored")
                 return 
@@ -235,44 +229,12 @@ class Media:
         if not STORE_IMAGES:
             return None
 
-        def imgur(url):
-            logger.info("found imgur url")
-            content = download_page_decoded(url)
-            match1 = re.search('<a href="(.*)" target="_blank">View full resolution', content)
-            match2 = re.search('<link rel="image_src" href="(.*)"\s*/>', content)
-            match = match1 or match2
-            if match:
-                logger.info("imgur match")
-                imageurl = match.group(1)
-                if imageurl:
-                    return imageurl
-            else:
-                return None
-
         # prefix for URLs in general
         match = re.search("(" + URL_REGEX_PREFIX + ".*(\.jpeg|\.jpg|\.png|\.gif))", url)
-        imgurmatch = re.search("(" + URL_REGEX_PREFIX + "imgur.com/(.*/)?((\d|\w)*)(/)?)", url)
-        if imgurmatch:
-            url = imgur(imgurmatch.group(1))
-
-        if match is None and imgurmatch is None:
+        if match is None:
             return None
 
         logger.info("Found image url: " + url)
         return ("image", url)
-
-    def parse_youtube(self, url):
-        if not STORE_YOUTUBE:
-            return None
-
-        match_youtube = re.search(URL_REGEX_PREFIX + "youtube\.com/watch.*v=(\S{11})", url)
-        match_youtube_short = re.search(URL_REGEX_PREFIX + "youtu\.be/(\S+)", url)
-        match = match_youtube or match_youtube_short
-        if match is None:
-            return
-        video_id = match.group(1)
-
-        logger.info("Found youtube video: " + video_id)
-        return ("youtube", video_id)
 
 CLASS_ = InformationRetrieval

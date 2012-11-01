@@ -19,9 +19,17 @@
 
 class InformationSource:
 
-    def retrieve_information(self, url):
+    def __init__(self, bot):
+        self.bot = bot
+        self.msg_formats = self.bot.transport.msg_formats
+
+    def find_info(self, url):
+        """Retrieve a string of information that will be displayed by the bot
+        after the link was posted"""
         return None
 
-    def get_media_info(self, url):
+    def find_media_info(self, url):
+        """Find out the type of the media item (the type determines how it is
+        displayed on the web server media list"""
         return None
 
