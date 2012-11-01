@@ -152,7 +152,7 @@ class Regex:
             # try to find info
             match = re.search(info["pattern"], content)
             if match is None:
-                logger.warning("Could not find info! (match == None)")
+                logger.warning("Could not find info! (match == None) with pattern: " + info["pattern"])
                 break
             if match.groups() is None:
                 logger.warning("match.groups() was None")
