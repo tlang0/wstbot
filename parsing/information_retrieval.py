@@ -80,14 +80,15 @@ class InformationRetrieval(Parser):
         # try them in order; if the first one succeeds, the second one is not called
         info, title = info_from_modules() or info_from_regex() 
 
-        # store media
-        if source is not None:
-            # use the media handler of the object that was used for information retrieval
-            type_, url = source.find_media_info(url)
-            self.media.store_media(url, title=title, type_=type_)
-        else:
-            # use the builtin media handlers
-            self.media.store_media(url, title=title)
+        if msg.strip()[-1] != "#":
+            # store media
+            if source is not None:
+                # use the media handler of the object that was used for information retrieval
+                type_, url = source.find_media_info(url)
+                self.media.store_media(url, title=title, type_=type_)
+            else:
+                # use the builtin media handlers
+                self.media.store_media(url, title=title)
 
         return info
 
