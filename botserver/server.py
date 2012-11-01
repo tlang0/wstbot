@@ -18,7 +18,14 @@
 ########################################################################
 
 import configparser
+import logging
+import os
 from botserver import cherryserver
+from wstbot_locals import FILE_LOG_FORMAT, STREAM_LOG_FORMAT
+
+FILE_LOG = os.path.join("botserver", "server.log")
+logger = logging.getLogger("server")
+logger.propagate = False
 
 class Server:
 
@@ -36,6 +43,20 @@ def load_server():
     port = parser.get(category, "port")
     return Server(int(port))
 
+def init_logging():
+    # stream handler
+    stream_handler = logging.StreamHandler()
+    stream_formatter = logging.Formatter(STREAM_LOG_FORMAT)
+    stream_handler.setFormatter(stream_formatter)
+    # file handler
+    file_handler = logging.FileHandler(FILE_LOG)
+    file_formatter = logging.Formatter(FILE_LOG_FORMAT)
+    file_handler.setFormatter(file_formatter)
+    # add handlers
+    logger.addHandler(stream_handler)
+    logger.addHandler(file_handler)
+
 if __name__ == "__main__":
+    init_logging()
     server = load_server()
     server.start()
