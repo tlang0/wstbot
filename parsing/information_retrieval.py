@@ -37,7 +37,6 @@ SOURCES_PATH = os.path.join("parsing", "information_retrieval_sources")
 
 # what kinds of links should be stored?
 STORE_IMAGES = True
-STORE_YOUTUBE = True
 STORE_LINKS = True # meaning all other links
 ITEMS_PER_PAGE = 15
 
