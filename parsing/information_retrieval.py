@@ -63,6 +63,8 @@ class InformationRetrieval(Parser):
             return
 
         source = None
+        info = None
+        title = None
 
         def info_from_sources():
             nonlocal source
@@ -78,7 +80,9 @@ class InformationRetrieval(Parser):
         # find infos using regex patterns
         info_from_regex = lambda: self.regex.find_info(url)
         # try them in order; if the first one succeeds, the second one is not called
-        info, title = info_from_modules() or info_from_regex() 
+        r = info_from_modules() or info_from_regex() 
+        if r is not None:
+            info, title = r
 
         if msg.strip()[-1] != "#":
             # store media
