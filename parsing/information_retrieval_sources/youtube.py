@@ -33,7 +33,7 @@ class Youtube(InformationSource):
 
     def find_info(self, url):
         # valid youtube url?
-        match_normal = re.match(URL_REGEX_PREFIX + "youtube\.com/watch.*v=(\S{11})", url)
+        match_normal = re.search(URL_REGEX_PREFIX + "youtube\.com/watch.*v=(\S{11})", url)
         match_short = re.search(URL_REGEX_PREFIX + "youtu\.be/(\S+)", url)
         match = match_normal or match_short
         if match is None:
@@ -46,7 +46,6 @@ class Youtube(InformationSource):
         content = download_page_decoded(url)
         if content is None:
             return
-
         match_title = re.search('<meta property="og:title" content="(.+)"\s*>', content)
         match_duration = re.search('<meta itemprop="duration" content="PT(.+)"\s*>', content)
         if (match_title and match_duration) is None:
@@ -60,7 +59,14 @@ class Youtube(InformationSource):
         duration = duration.replace("H", "h ")
         duration = self.msg_formats.green(duration)
 
-        message = "{0} :: {1}".format(title, duration)
+        # add starting point
+        at = ""
+        print(match.group(0))
+        match_t = re.search("(&|#|\?)t=(?P<time>\S*?)(&.*?)?$", url)
+        if match_t is not None:
+            at = self.msg_formats.blue("(" + match_t.group("time") + ") ")
+
+        message = "{}{} :: {}".format(at, title, duration)
 
         return (message, raw_title)
 
