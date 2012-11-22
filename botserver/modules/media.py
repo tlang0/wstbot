@@ -110,12 +110,17 @@ class MediaListBuilder:
         return new_html
 
     def backup_db(self):
-        # make a backup
+        """Make a backup of the database"""
+
         try:
             os.mkdir(BACKUP_PATH)
+        except os.error as e:
+            print(e)
+
+        try:
             os.mkdir(BACKUP_DB_PATH)
-        except os.error:
-            pass
+        except os.error as e:
+            print(e)
 
         shutil.copyfile(MEDIA_DB_PATH, os.path.join(BACKUP_DB_PATH, "media.db." + str(time.time())))
 

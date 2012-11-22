@@ -6,7 +6,6 @@ $(function () {
 
     // if it's a search
     if ($("body").attr("data-search") === "True") {
-        console.log("asdf?");
         LOADED_ALL = true;
         $("#load-button").hide();
     }
