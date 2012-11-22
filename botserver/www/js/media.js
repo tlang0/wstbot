@@ -4,6 +4,13 @@ $(function () {
         justReachedBottom = false,
         mediaContent = $("#media-content");
 
+    // if it's a search
+    if ($("body").attr("data-search") === "True") {
+        console.log("asdf?");
+        LOADED_ALL = true;
+        $("#load-button").hide();
+    }
+
     function deleteItemClick() {
         var button = $(this),
             id = button.attr("id");

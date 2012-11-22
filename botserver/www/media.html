@@ -7,8 +7,14 @@
     <script src="/js/jquery-1.8.2.min.js"></script>
     <script src="/js/media.js"></script>
   </head>
-  <body>
+  <body data-search="${search}">
     <div id="escape"><a href="/media/nojs" title="Switch to page view">Switch to page view</a></div>
+    <div>
+      <form method="get" action="/media">
+        <input type="text" name="search" title="Search filter" />
+        <input type="submit" value="Filter on title" />
+      </form>
+    </div>
     <ul id="media-content" data-nr="${nr}">
 ${media}
     </ul>

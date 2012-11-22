@@ -28,7 +28,7 @@ from string import Template
 
 # places newer entries on top if true
 MEDIA_DB_PATH = os.path.join(DATA_PATH, "media.db")
-BACKUP_DB_PATH = os.path.join(DATA_PATH, "media")
+BACKUP_DB_PATH = os.path.join(BACKUP_PATH, "media")
 DEFAULT_FILE = "media.html"
 NOJS_FILE = "media-nojs.html"
 ITEMS_PER_PAGE = 15
@@ -39,9 +39,10 @@ class MediaListBuilder:
 
     def __init__(self):
         self.nr = 0
+        self.is_search = False
 
     @cherrypy.expose
-    def load(self, nr=0, ascending=False):
+    def load(self, nr=0, ascending=False, search=None):
         """Return items starting at nr"""
 
         self.nr = nr
@@ -51,23 +52,29 @@ class MediaListBuilder:
         # get the media data and construct the page
         with sqlite3.connect(MEDIA_DB_PATH) as conn:
             cur = conn.cursor()
-            cur.execute("select * from media order by id " + order + " limit ?, ?", 
-                    (nr, ITEMS_PER_PAGE))
+            if search is not None:
+                qry = "select * from media where title like '%' || ? || '%' order by id " + order
+                data = (search,)
+            else:
+                qry = "select * from media order by id " + order + " limit ?, ?"
+                data = (nr, ITEMS_PER_PAGE)
+            cur.execute(qry, data)
 
             # insert media
             for row in cur:
                 htmldata += self.make_content_html(id=row[0], type=row[1], title=row[2], url=row[3])
                 htmldata += "<hr />\n"
 
+        self.is_search = False if search is None else True
         return htmldata
 
     @cherrypy.expose
-    def index(self, nr=0, ascending=False):
+    def index(self, nr=0, ascending=False, search=None):
         html_template = get_template_content(DEFAULT_FILE)
         template = Template(html_template)
         
-        htmldata = self.load(nr, ascending)
-        new_html = template.substitute(media=htmldata, nr=self.nr)
+        htmldata = self.load(nr, ascending=ascending, search=search)
+        new_html = template.substitute(media=htmldata, nr=self.nr, search=self.is_search)
 
         return new_html
 
@@ -124,8 +131,6 @@ class MediaListBuilder:
         with sqlite3.connect(MEDIA_DB_PATH) as conn:
             cur = conn.cursor()
             cur.execute("delete from media where id = ?", (id_,))
-
-        return id_
 
     def make_content_html(self, **row):
         """row should be a dict"""
