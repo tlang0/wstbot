@@ -137,6 +137,8 @@ class MediaListBuilder:
             cur = conn.cursor()
             cur.execute("delete from media where id = ?", (id_,))
 
+        return id_
+
     def make_content_html(self, **row):
         """row should be a dict"""
 
