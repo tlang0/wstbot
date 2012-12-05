@@ -152,13 +152,16 @@ class MediaListBuilder:
         if "title" in row:
             title = row["title"]
 
+        # replace double quotes
+        title = title.replace("\"", "&quot;")
+
         # add the actual content
         if type_ == "link":
             if title == "":
                 title = url
             html_str += '<a href="{0}" title="{1}">{1}</a>'.format(url, title)
         elif type_ == "image":
-            html_str += '<img src="{0}" alt="{1}" title={2} />'.format(url, title, title)
+            html_str += '<img src="{0}" alt="{1}" title="{2}" />'.format(url, title, title)
         elif type_ == "youtube":
             if title != "":
                 html_str += '<div class="item-title">{0}</div>\n'.format(title)
