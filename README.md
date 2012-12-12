@@ -32,7 +32,7 @@ Wstbot consists of 3 Parts:
 The most comfortable way to run wstbot is to just start the control interface and use that.
 Run it like this:
 
-$ python3 -m botserver.control_interface
+    python3 -m botserver.control_interface
 
 Then visit http://localhost:8112/ in a web browser (8112 is the default port).
 
