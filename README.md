@@ -15,11 +15,9 @@ Dependencies
 Installation
 ------------
 
-* Edit wstbot.conf.EXAMPLE and rename it to wstbot.conf.
-* Rename data/regex.yaml.EXAMPLE to data/regex.yaml (and add some sites if you want to).
-* Modules may have their own setup scripts. Run this to execute all of them:
-
-    python3 setup.py
+1. Edit wstbot.conf.EXAMPLE and rename it to wstbot.conf.
+2. Rename data/regex.yaml.EXAMPLE to data/regex.yaml (and add some sites if you want to).
+3. Modules may have their own setup scripts. Run ``python3 setup.py`` to execute all of them.
 
 Usage
 -----
