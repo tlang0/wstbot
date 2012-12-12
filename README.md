@@ -19,7 +19,7 @@ Installation
 * Rename data/regex.yaml.EXAMPLE to data/regex.yaml (and add some sites if you want to).
 * Modules may have their own setup scripts. Run this to execute all of them:
 
-  $ python3 setup.py
+    python3 setup.py
 
 Usage
 -----
