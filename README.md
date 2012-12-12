@@ -5,7 +5,7 @@ Wstbot is a chat bot for IRC and XMPP (Jabber) with modular features.
 It is developed by wst, wstcode@gmail.com.
 
 Dependencies
-============
+------------
 
 * python 3.1+
 * cherrypy
@@ -13,7 +13,7 @@ Dependencies
 * sleekxmpp for xmpp
 
 Installation
-============
+------------
 
 * Edit wstbot.conf.EXAMPLE and rename it to wstbot.conf.
 * Rename data/regex.yaml.EXAMPLE to data/regex.yaml (and add some sites if you want to).
@@ -22,7 +22,7 @@ Installation
   $ python3 setup.py
 
 Usage
-=====
+-----
 
 Wstbot consists of 3 Parts:
 * A chat bot, which is the main part. There is a Jabber and an IRC version.
@@ -42,18 +42,18 @@ You can also start everything manually:
 
 To start the server, run:
 
-$ python3 -m botserver.server
+    python3 -m botserver.server
 
 To start the IRC bot, run:
 
-$ python3 -m wstbot_irc
+    python3 -m wstbot_irc
 
 To start the XMPP bot, run:
 
-$ python3 -m wstbot_xmpp
+    python3 -m wstbot_xmpp
 
 License
-=======
+-------
 
 Wstbot is licensed unter the GPLv3, which can be found in the COPYING 
 file.
