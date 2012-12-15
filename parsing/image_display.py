@@ -26,6 +26,8 @@ OH_NO = "Your XMPP client doesn't show images."
 class ImageDisplay(Parser):
     
     def parse(self, msg, nick):
+        if msg.strip()[-1] == "+":
+            return None
         img_url_match = re.search(URL_REGEX_PREFIX + "\S+\.(png|jpg|jpeg|gif)", msg)
         if img_url_match:
             img_url = img_url_match.group(0)
