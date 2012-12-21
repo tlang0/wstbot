@@ -26,7 +26,7 @@ from wstbot_locals import FILE_LOG_FORMAT, STREAM_LOG_FORMAT
 FILE_LOG = os.path.join("botserver", "server.log")
 logger = logging.getLogger("server")
 logger.propagate = False
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 class Server:
 

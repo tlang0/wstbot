@@ -56,8 +56,12 @@ class MediaListBuilder:
         with sqlite3.connect(MEDIA_DB_PATH) as conn:
             cur = conn.cursor()
             if search is not None:
-                qry = "select * from media where title like '%' || ? || '%' order by id " + order
-                data = (search,)
+                if search.filter_on == "url":
+                    qry = "select * from media where url like '%' || ? || '%' order by id " + order
+                else:
+                    # filter on title by default
+                    qry = "select * from media where title like '%' || ? || '%' order by id " + order
+                data = (search.text,)
             else:
                 qry = "select * from media order by id " + order + " limit ?, ?"
                 data = (nr, ITEMS_PER_PAGE)
@@ -68,13 +72,17 @@ class MediaListBuilder:
                 htmldata += self.make_content_html(id=row[0], type=row[1], title=row[2], url=row[3])
                 htmldata += "<hr />\n"
 
-        self.is_search = False if search is None else True
         return htmldata
 
     @cherrypy.expose
-    def index(self, nr=0, ascending=False, search=None):
+    def index(self, nr=0, ascending=False, search_text=None, filter_on=None):
         html_template = get_template_content(DEFAULT_FILE)
         template = Template(html_template)
+
+        self.is_search = False if search_text is None else True
+        search = None
+        if search_text is not None:
+            search = Search(search_text, filter_on)
         
         htmldata = self.load(nr, ascending=ascending, search=search)
         new_html = template.substitute(media=htmldata, nr=self.nr, search=self.is_search)
@@ -188,6 +196,12 @@ class MediaListBuilder:
 
         html_str += "</li>\n"
         return html_str
+
+class Search:
+
+    def __init__(self, text, filter_on):
+        self.text = text
+        self.filter_on = filter_on
 
 def get():
     builder = MediaListBuilder()
