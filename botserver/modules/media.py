@@ -22,6 +22,7 @@ import sqlite3
 import cherrypy
 import shutil
 import time
+import logging
 from wstbot_locals import DATA_PATH, TEMPLATES_PATH, BACKUP_PATH
 from botserver.util import get_template_content
 from string import Template
@@ -32,6 +33,8 @@ BACKUP_DB_PATH = os.path.join(BACKUP_PATH, "media")
 DEFAULT_FILE = "media.html"
 NOJS_FILE = "media-nojs.html"
 ITEMS_PER_PAGE = 15
+
+logger = logging.getLogger("server")
 
 class MediaListBuilder:
     """Build an html media list from the media database.
@@ -115,12 +118,12 @@ class MediaListBuilder:
         try:
             os.mkdir(BACKUP_PATH)
         except os.error as e:
-            print(e)
+            logger.error(e)
 
         try:
             os.mkdir(BACKUP_DB_PATH)
         except os.error as e:
-            print(e)
+            logger.error(e)
 
         shutil.copyfile(MEDIA_DB_PATH, os.path.join(BACKUP_DB_PATH, "media.db." + str(time.time())))
 
@@ -130,6 +133,7 @@ class MediaListBuilder:
         try:
             self.backup_db()
         except:
+            logger.error("DB Backup failed (delete)!")
             return ""
 
         # delete item with id_
