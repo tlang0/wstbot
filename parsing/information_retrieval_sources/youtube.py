@@ -45,10 +45,12 @@ class Youtube(InformationSource):
         # find info
         content = download_page_decoded(url)
         if content is None:
+            logger.warning("Error downloading content!")
             return
         match_title = re.search('<meta property="og:title" content="(.+)"\s*>', content)
         match_duration = re.search('<meta itemprop="duration" content="PT(.+)"\s*>', content)
         if (match_title and match_duration) is None:
+            logger.warning("Could not find information about the video!")
             return
 
         raw_title = match_title.group(1)
