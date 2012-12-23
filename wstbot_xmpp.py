@@ -18,7 +18,6 @@
 ########################################################################
 
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import logging
 import configparser
@@ -56,14 +55,10 @@ class WstBotXMPP(WstXMPP):
         if msg["mucnick"] == self.nick:
             return
 
-        # debug output
-        #print("==================================================")
-        #b = bytearray(msg["body"], "utf-8")
-        #for orsch in b:
-        #    print(orsch)
-        #print("==================================================")
-
-        self.wstbot.handle_message(msg["from"].resource, msg["body"])
+        if "!users" in msg["body"]: # handle xmpp-specific commands
+            self.send_user_list()
+        else: # handle bot commands
+            self.wstbot.handle_message(msg["from"].resource, msg["body"])
 
     def muc_online(self, presence):
         room_name = self.room_local_name(presence["muc"]["room"])
@@ -72,6 +67,15 @@ class WstBotXMPP(WstXMPP):
         else:
             #self.wstbot.on_join(presence["muc"]["nick"])
             pass
+
+    def send_user_list(self):
+        users = self.plugin["xep_0045"].getRoster(self.room)
+        user_list = ""
+        for user in users:
+            user_list += user + ", "
+        if user_list[-2:] == ", ":
+            user_list = user_list[:-2]
+        self.send_room_message(user_list)
 
     def room_local_name(self, room_name):
         return room_name[:room_name.find("@")]
