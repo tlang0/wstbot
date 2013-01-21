@@ -7,12 +7,16 @@ $(function () {
     /***** Hiding Videos *****/
 
     // hide all videos (iframes)
-    function hideVideos() {
-        $("iframe").before("<img src=\"/img/video_placeholder.png\" alt=\"Video Placeholder\" " +
+    function hideVideos(context) {
+        if (arguments.length === 0) {
+            context = mediaContent;
+        }
+
+        $("iframe", context).before("<img src=\"/img/video_placeholder.png\" alt=\"Video Placeholder\" " +
             "title=\"Click to see the video\" class=\"video-placeholder\" />");
-        $("iframe + .delete-button").hide();
-        $("iframe").hide();
-        $(".video-placeholder").click(showVideoClick);
+        $("iframe + .delete-button", context).hide();
+        $("iframe", context).hide();
+        $(".video-placeholder", context).click(showVideoClick);
     }
     // hide videos on startup
     hideVideos();
@@ -70,7 +74,12 @@ $(function () {
         nr = parseInt(nr, 10) + ITEMS_PER_PAGE;
         // reached the end?
         $.get("/media/load/" + nr, function (data) {
-            mediaContent.append(data);
+            var dataDOM = $.parseHTML(data);
+
+            // hide videos in new content
+            hideVideos(dataDOM);
+
+            mediaContent.append(dataDOM);
             mediaContent.attr("data-nr", nr);
             if (data === "") {
                 stop();
