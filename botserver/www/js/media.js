@@ -4,11 +4,34 @@ $(function () {
         justReachedBottom = false,
         mediaContent = $("#media-content");
 
+    /***** Hiding Videos *****/
+
+    // hide all videos (iframes)
+    function hideVideos() {
+        $("iframe").before("<img src=\"/img/video_placeholder.png\" alt=\"Video Placeholder\" " +
+            "title=\"Click to see the video\" class=\"video-placeholder\" />");
+        $("iframe + .delete-button").hide();
+        $("iframe").hide();
+        $(".video-placeholder").click(showVideoClick);
+    }
+    // hide videos on startup
+    hideVideos();
+
+    function showVideoClick() {
+        $(this).hide();
+        $(this).siblings("iframe").show();
+        $(this).siblings(".delete-button").show();
+    }
+
+    /***** Search *****/
+
     // if it's a search
     if ($("body").attr("data-search") === "True") {
         LOADED_ALL = true;
         $("#load-button").hide();
     }
+
+    /***** Deleting *****/
 
     function deleteItemClick() {
         var button = $(this),
@@ -30,12 +53,15 @@ $(function () {
     }
     bindDelete();
 
+    /***** Loading Content / Scrolling *****/
+
     function stop() {
         $("#load-button").hide();
         LOADED_ALL = true;
         mediaContent.append("<p>You have reached the bottom! :)</p>");
     }
 
+    // load additional items
     function loadContent() {
         var nr = mediaContent.attr("data-nr");
         if (LOADED_ALL) {

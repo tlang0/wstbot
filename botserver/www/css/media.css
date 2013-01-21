@@ -41,6 +41,11 @@ body {
     vertical-align: center;
 }
 
+.video-placeholder {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
 img {
     clear: both;
     max-width: 1000px;

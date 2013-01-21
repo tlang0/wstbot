@@ -27,6 +27,12 @@ from wstbot_locals import DATA_PATH, TEMPLATES_PATH, BACKUP_PATH
 from botserver.util import get_template_content
 from string import Template
 
+YOUTUBE_VIDEO_HTML = ('<iframe width="720" height="405" src="http://www.youtube.com/embed/{0}" '
+                    + 'frameborder="0" title="{1}" allowfullscreen></iframe>')
+VIMEO_VIDEO_HTML = ('<iframe src="http://player.vimeo.com/video/{0}" width="720" height="405" '
+                    + 'frameborder="0" title="{1}" webkitAllowFullScreen mozallowfullscreen '
+                    + 'allowFullScreen></iframe>')
+
 # places newer entries on top if true
 MEDIA_DB_PATH = os.path.join(DATA_PATH, "media.db")
 BACKUP_DB_PATH = os.path.join(BACKUP_PATH, "media")
@@ -177,14 +183,11 @@ class MediaListBuilder:
         elif type_ == "youtube":
             if title != "":
                 html_str += '<div class="item-title">{0}</div>\n'.format(title)
-            html_str += ('<iframe width="720" height="405" src="http://www.youtube.com/embed/{0}" ' \
-                    + 'frameborder="0" title="{1}" allowfullscreen></iframe>').format(url, title)
+            html_str += YOUTUBE_VIDEO_HTML.format(url, title)
         elif type_ == "vimeo":
             if title != "":
                 html_str += '<div class="item-title">{0}</div>\n'.format(title)
-            html_str += ('<iframe src="http://player.vimeo.com/video/{0}" width="720" height="405" ' \
-                    + 'frameborder="0" title="{1}" webkitAllowFullScreen mozallowfullscreen ' \
-                    + 'allowFullScreen></iframe>').format(url, title)
+            html_str += VIMEO_VIDEO_HTML.format(url, title)
         else:
             return "Invalid type!\n"
 
