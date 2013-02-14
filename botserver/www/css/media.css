@@ -4,15 +4,39 @@ body {
     padding: 0;
 }
 
+a {
+    text-decoration: none;
+}
+
+a:link {
+    color: rgb(0, 100, 200);
+}
+
+a:visited {
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:active {
+}
+
 #search-panel {
     background-color: rgb(238, 238, 238);
     padding: 0.7em;
-    margin-bottom: 1em;
+    margin-bottom: 1.5em;
     border-bottom: 2px solid rgb(220, 220, 220);
+}
+
+#media-content a, .item-title {
+    font-size: 12pt;
 }
 
 #escape {
     position: absolute;
+    top: 0.5em;
+    right: 0.5em;
 }
 
 .navigation {
@@ -59,10 +83,12 @@ ul {
 
 hr {
     border: 0;
-    width: 45%;
+    width: 5%;
     color: #bbb;
-    background-color: #bbb;
-    height: 1px;
+    background-color: rgb(215, 215, 215);
+    height: 2px;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
 }
 
 .nav-divider {
