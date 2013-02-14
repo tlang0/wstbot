@@ -1,18 +1,18 @@
 body {
     text-align: center;
+    margin: 0;
+    padding: 0;
 }
 
 #search-panel {
-    background-color: #eee;
-    padding: 1em;
-    margin-top: 0.5em;
+    background-color: rgb(238, 238, 238);
+    padding: 0.7em;
     margin-bottom: 1em;
-    border: 2px solid #444;
+    border-bottom: 2px solid rgb(220, 220, 220);
 }
 
 #escape {
-    width: 100%;
-    text-align: right;
+    position: absolute;
 }
 
 .navigation {
