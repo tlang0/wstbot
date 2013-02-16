@@ -62,12 +62,12 @@ class MediaListBuilder:
         with sqlite3.connect(MEDIA_DB_PATH) as conn:
             cur = conn.cursor()
             if search is not None:
-                if search.filter_on == "url":
-                    qry = "select * from media where url like '%' || ? || '%' order by id " + order
-                else:
-                    # filter on title by default
-                    qry = "select * from media where title like '%' || ? || '%' order by id " + order
-                data = (search.text,)
+                if search.text == "":
+                    return "Empty search!"
+                # filter on title and url
+                qry = ("select * from media where title like '%' || ? || '%' or url like '%' "
+                    + "|| ? || '%' order by id " + order)
+                data = (search.text, search.text)
             else:
                 qry = "select * from media order by id " + order + " limit ?, ?"
                 data = (nr, ITEMS_PER_PAGE)
