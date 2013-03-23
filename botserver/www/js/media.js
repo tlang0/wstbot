@@ -1,5 +1,6 @@
 $(function () {
     var ITEMS_PER_PAGE = 15,
+        ITEMS_TOTAL = ITEMS_PER_PAGE + 10;
         LOADED_ALL = false,
         justReachedBottom = false,
         mediaContent = $("#media-content");
@@ -70,8 +71,8 @@ $(function () {
         var liItems = $("li");
         var hrItems = $("hr"); // for every li, there is an hr
         var num = liItems.length;
-        var numToRemove = num - ITEMS_PER_PAGE;
-        if (num > ITEMS_PER_PAGE) {
+        var numToRemove = num - ITEMS_TOTAL;
+        if (num > ITEMS_TOTAL) {
             liItems.slice(0, numToRemove).remove();
             hrItems.slice(0, numToRemove).remove();
         }
