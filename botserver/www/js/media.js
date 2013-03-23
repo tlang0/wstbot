@@ -100,8 +100,6 @@ $(function () {
             justReachedBottom = false;
             bindDelete();
         });
-
-        hideOld();
     }
 
     $(document).scroll(function () {
