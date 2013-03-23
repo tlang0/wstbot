@@ -34,9 +34,20 @@ a:active {
     z-index: 1;
 }
 
+#media-content {
+    padding-top: 4em;
+}
+
 #media-content a, .item-title {
     font-size: 12pt;
     z-index: 0;
+}
+
+#cleanup {
+    position: fixed;
+    z-index: 2;
+    top: 0.5em;
+    left: 0.5em;
 }
 
 #escape {

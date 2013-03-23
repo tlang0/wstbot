@@ -113,4 +113,5 @@ $(function () {
     });
 
     $("#load-button").click(loadContent);
+    $("#cleanup").click(hideOld);
 });
