@@ -62,7 +62,19 @@ $(function () {
     function stop() {
         $("#load-button").hide();
         LOADED_ALL = true;
-        mediaContent.append("<p>You have reached the bottom! :)</p>");
+        mediaContent.append("<p>You have reached the bottom! ;)</p>");
+    }
+
+    // hide the first items so that the number of displayed items stays constant
+    function hideOld() {
+        var liItems = $("li");
+        var hrItems = $("hr"); // for every li, there is an hr
+        var num = liItems.length;
+        var numToRemove = num - ITEMS_PER_PAGE;
+        if (num > ITEMS_PER_PAGE) {
+            liItems.slice(0, numToRemove).remove();
+            hrItems.slice(0, numToRemove).remove();
+        }
     }
 
     // load additional items
@@ -87,6 +99,8 @@ $(function () {
             justReachedBottom = false;
             bindDelete();
         });
+
+        hideOld();
     }
 
     $(document).scroll(function () {
