@@ -27,16 +27,23 @@ a:active {
     padding: 0.7em;
     margin-bottom: 1.5em;
     border-bottom: 2px solid rgb(220, 220, 220);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
 }
 
 #media-content a, .item-title {
     font-size: 12pt;
+    z-index: 0;
 }
 
 #escape {
-    position: absolute;
+    position: fixed;
     top: 0.5em;
     right: 0.5em;
+    z-index: 2;
 }
 
 .navigation {
