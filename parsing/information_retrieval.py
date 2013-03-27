@@ -186,12 +186,12 @@ class Siteinfo:
                 break
 
             infodata = None
-            # xpath is preferred
-            if "xpath" in info:
-                infodata = info_xpath()
-            # try regex alternatively
-            if infodata is None and "pattern" in info:
+            # try regex first because it seems to be faster
+            if "pattern" in info:
                 infodata = info_regex()
+            # try xpath if there was no pattern or regex was unsuccessful
+            if infodata is None and "xpath" in info:
+                infodata = info_xpath()
 
             if infodata is None:
                 logger.warning("infodata was None!")
