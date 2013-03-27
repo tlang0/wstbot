@@ -35,8 +35,8 @@ class Link(Command):
         argstr = argstr.strip()
         if argstr == "media":
             return server_url + "/media"
-        elif argstr == "regex" or argstr == "news":
-            return server_url + "/regex"
+        elif argstr == "siteinfo" or argstr == "regex" or argstr == "news":
+            return server_url + "/siteinfo"
         elif argstr == "interface":
             return address + ":" + web_interface_port
         else:

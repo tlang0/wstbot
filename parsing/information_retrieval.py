@@ -27,12 +27,13 @@ from parsing.parser import Parser
 from util import (parse_for_url, unescape, get_modules_objects, 
                   first, chain_call, download_page, download_page_decoded)
 from wstbot_locals import WEB_ENCODING, URL_REGEX_PREFIX
+from lxml import etree
 
 logger = logging.getLogger("wstbot")
 
 # paths
 MEDIA_DB_PATH = os.path.join("data", "media.db")
-REGEX_FILE_PATH = os.path.join("data", "regex.yaml")
+SITEINFO_FILE_PATH = os.path.join("data", "siteinfo.yaml")
 SOURCES_PATH = os.path.join("parsing", "information_retrieval_sources")
 
 # what kinds of links should be stored?
@@ -46,7 +47,7 @@ class InformationRetrieval(Parser):
         super().__init__(*args)
 
         self.media = self.init_media()
-        self.regex = Regex(self.msg_formats)
+        self.siteinfo = Siteinfo(self.msg_formats)
 
         self.sources = get_modules_objects(SOURCES_PATH, f=lambda x: x(self.bot))
 
@@ -77,10 +78,10 @@ class InformationRetrieval(Parser):
 
         # try to find info by using the source modules
         info_from_modules = lambda: info_from_sources()
-        # find infos using regex patterns
-        info_from_regex = lambda: self.regex.find_info(url)
+        # find infos using siteinfo object
+        info_from_siteinfo = lambda: self.siteinfo.find_info(url)
         # try them in order; if the first one succeeds, the second one is not called
-        r = info_from_modules() or info_from_regex() 
+        r = info_from_modules() or info_from_siteinfo() 
         if r is not None:
             info, title = r
 
@@ -96,53 +97,53 @@ class InformationRetrieval(Parser):
 
         return info
 
-class Regex:
+class Siteinfo:
 
     def __init__(self, msg_formats):
-        self.regexdata = None
+        self.sitedata = None
         self.msg_formats = msg_formats
         self.mtime = None
-        self.load_yaml_regex()
+        self.load_yaml_siteinfo()
 
-    def load_yaml_regex(self):
-        mtime = os.path.getmtime(REGEX_FILE_PATH)
+    def load_yaml_siteinfo(self):
+        mtime = os.path.getmtime(SITEINFO_FILE_PATH)
         if self.mtime is None or mtime > self.mtime:
-            # load regex strings
-            with open(REGEX_FILE_PATH, "r") as regex_file:
-                self.regexdata = yaml.safe_load(regex_file)
-            self.mtime = os.path.getmtime(REGEX_FILE_PATH)
+            # load siteinfo data
+            with open(SITEINFO_FILE_PATH, "r") as siteinfo_file:
+                self.sitedata = yaml.safe_load(siteinfo_file)
+            self.mtime = os.path.getmtime(SITEINFO_FILE_PATH)
 
     def patterns_for_url(self, url):
         """Get the information dict from the yaml file for the url contained in msg.
         Returns a tuple (url, resource_dict) where info is the yaml dict"""
 
-        # reload regex data if it has changed
-        self.load_yaml_regex()
+        # reload siteinfo data if it has changed
+        self.load_yaml_siteinfo()
                 
-        for resource_dict in self.regexdata["sources"]:
+        for resource_dict in self.sitedata["sources"]:
             try:
                 match = re.search(resource_dict["url pattern"], url)
             except:
-                logger.warning("bad regex: " + resource_dict["url pattern"])
+                logger.warning("Bad url pattern: " + resource_dict["url pattern"])
                 continue
             if not match:
                 continue
 
             url = match.group(1)
-            logger.info("Found information from " + resource_dict["name"] + "!")
+            logger.info("Found siteinfo url for " + resource_dict["name"] + "!")
             logger.info("url: " + url)
 
             return (url, resource_dict)
 
-    def do_regex(self, url, resource_dict):
-        """Downloads the URL's content, searches for the regular expressions
+    def search_site(self, url, resource_dict):
+        """Downloads the URL's content, searches for the paths and patterns
         and builds a message out of the matched data.
 
-        Arguments: resource_dict contains the patterns and additional data for
+        Arguments: resource_dict contains the paths, patterns and additional data for
         the url.
         """
 
-        if self.regexdata is None:
+        if self.sitedata is None:
             return
 
         # retrieve content
@@ -153,8 +154,13 @@ class Regex:
         message = None
         title = None
 
-        for info in resource_dict["patterns"]:
-            # try to find info
+        def info_xpath():
+            # try to find info using xpath
+            root = etree.XML(content)
+            return root.XPath(info["xpath"])
+
+        def info_regex():
+            # try to find info using a regex pattern
             match = re.search(info["pattern"], content)
             if match is None:
                 logger.warning("Could not find info! (match == None) with pattern: " + info["pattern"])
@@ -166,7 +172,20 @@ class Regex:
                 logger.warning("Found match but no groups")
                 break
 
-            infodata = match.group(1)
+            return match.group(1)
+
+        for info in resource_dict["patterns"]:
+            # xpath is preferred
+            if "xpath" in info:
+                infodata = info_path()
+            elif "pattern" in info:
+                infodata = info_regex()
+            else:
+                logger.error("siteinfo entry does not contain a path or pattern!")
+                break
+
+            if infodata is None or infodata == "":
+                continue
             logger.info("found info data: " + infodata)
             infodata = unescape(infodata)
 
@@ -178,10 +197,10 @@ class Regex:
                 message = ""
             message += self.msg_formats.get(info["style"], self.msg_formats.get(info["color"], infodata))
             if info != resource_dict["patterns"][-1]:
-                message += " " + self.regexdata["separator"] + " "
+                message += " " + self.sitedata["separator"] + " "
 
         # cut last separator if there is one
-        sep = self.regexdata["separator"]
+        sep = self.sitedata["separator"]
         if message is not None and message.strip()[-len(sep):] == sep:
             message = message.strip()[:-len(sep)].strip()
             
@@ -193,7 +212,7 @@ class Regex:
         if r is None:
             return
         url, resource_dict = r
-        return self.do_regex(url, resource_dict)
+        return self.search_site(url, resource_dict)
 
 class Media:
     """Parse for URLs that could be of interest and store them"""
