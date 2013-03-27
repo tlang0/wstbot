@@ -11,6 +11,7 @@ Dependencies
 * cherrypy
 * pyyaml
 * sleekxmpp for xmpp
+* lxml
 
 Installation
 ------------

@@ -27,36 +27,36 @@ from string import Template
 
 ENCODING = "utf-8"
 
-# regex constants
-REGEX_FILE_NAME = "regex.yaml"
-REGEX_FILE_PATH = os.path.join(DATA_PATH, REGEX_FILE_NAME)
-REGEX_BACKUP_PATH = os.path.join(BACKUP_PATH, "regex")
+# siteinfo constants
+SITEINFO_FILE_NAME = "siteinfo.yaml"
+SITEINFO_FILE_PATH = os.path.join(DATA_PATH, SITEINFO_FILE_NAME)
+SITEINFO_BACKUP_PATH = os.path.join(BACKUP_PATH, "siteinfo")
 
-class RegexUpdater:
-    """Updates the regex info for regex retrieval"""
+class SiteinfoUpdater:
+    """Updates the siteinfo info for info retrieval"""
 
     def __init__(self, html_template):
         self.html_template = html_template
 
-    def index(self, regex=None):
+    def index(self, siteinfo=None):
         return self.make_page(self.html_template)
     
-    def update(self, regexdata):
-        if regexdata is None:
-            print("New regex data was None!")
+    def update(self, infodata):
+        if infodata is None:
+            print("New info data was None!")
 
-        self.backup_regex()
+        self.backup_siteinfo()
 
-        # write new regex
-        fp = open(REGEX_FILE_PATH, "wb")
-        fp.write(regexdata.encode("utf-8"))
+        # write new data
+        fp = open(SITEINFO_FILE_PATH, "wb")
+        fp.write(infodata.encode("utf-8"))
         fp.close()
 
-        return "New regex file was written."
+        return "New siteinfo file was written."
 
-    def backup_regex(self):
-        if not os.path.exists(REGEX_FILE_PATH):
-            print("No previous regex data, nothing to back up!")
+    def backup_siteinfo(self):
+        if not os.path.exists(SITEINFO_FILE_PATH):
+            print("No previous siteinfo data, nothing to back up!")
             return
 
         # make a backup
@@ -66,26 +66,26 @@ class RegexUpdater:
             pass
 
         try:
-            os.mkdir(REGEX_BACKUP_PATH)
+            os.mkdir(SITEINFO_BACKUP_PATH)
         except os.error:
             pass
 
-        shutil.copyfile(REGEX_FILE_PATH, os.path.join(REGEX_BACKUP_PATH, REGEX_FILE_NAME + str(time.time())))
+        shutil.copyfile(SITEINFO_FILE_PATH, os.path.join(SITEINFO_BACKUP_PATH, SITEINFO_FILE_NAME + str(time.time())))
 
     def make_page(self, html_template):
         template = Template(html_template)
         content = ""
-        if os.path.exists(REGEX_FILE_PATH):
-            with open(REGEX_FILE_PATH, "rb") as fp:
+        if os.path.exists(SITEINFO_FILE_PATH):
+            with open(SITEINFO_FILE_PATH, "rb") as fp:
                 content = fp.read()
             content = content.decode(ENCODING)
 
-        new_html = template.substitute(regexdata=content)
+        new_html = template.substitute(infodata=content)
         return new_html
 
     index.exposed = True
     update.exposed = True
 
 def get():
-    updater = RegexUpdater(get_template_content("regex.html"))
+    updater = SiteinfoUpdater(get_template_content("siteinfo.html"))
     return updater
