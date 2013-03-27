@@ -101,10 +101,12 @@ ul {
 
 hr {
     border: 0;
-    width: 5%;
-    color: #bbb;
-    background-color: rgb(215, 215, 215);
-    height: 3px;
+    /*width: 5%;*/
+    min-width: 250px;
+    background-image: url('../img/separator.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 10px;
     margin-top: 1.5em;
     margin-bottom: 1.5em;
 }
