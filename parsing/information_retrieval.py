@@ -41,6 +41,12 @@ STORE_IMAGES = True
 STORE_LINKS = True # meaning all other links
 ITEMS_PER_PAGE = 15
 
+# siteinfo stuff
+FIRST_COLOR = "purple"
+FIRST_STYLE = "bold"
+REST_COLOR = "green"
+REST_STYLE = "default"
+
 class InformationRetrieval(Parser):
 
     def __init__(self, *args):
@@ -210,9 +216,13 @@ class Siteinfo:
             if title is None:
                 title = infodata
                 
+            color = REST_COLOR
+            style = REST_STYLE
             if message is None:
                 message = ""
-            message += self.msg_formats.get(info["style"], self.msg_formats.get(info["color"], infodata))
+                color = FIRST_COLOR
+                style = FIRST_STYLE
+            message += self.msg_formats.get(style, self.msg_formats.get(color, infodata))
             if info != resource_dict["patterns"][-1]:
                 message += " " + self.sitedata["separator"] + " "
 
