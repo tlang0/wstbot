@@ -23,11 +23,11 @@ import yaml
 import re
 import logging
 import sqlite3
+import lxml.html
 from parsing.parser import Parser
 from util import (parse_for_url, unescape, get_modules_objects, 
                   first, chain_call, download_page, download_page_decoded)
 from wstbot_locals import WEB_ENCODING, URL_REGEX_PREFIX
-from lxml import etree
 
 logger = logging.getLogger("wstbot")
 
@@ -156,36 +156,53 @@ class Siteinfo:
 
         def info_xpath():
             # try to find info using xpath
-            root = etree.XML(content)
-            return root.XPath(info["xpath"])
+            root = lxml.html.fromstring(content)
+            items = root.xpath(info["xpath"])
+            logger.debug("using xpath: " + info["xpath"])
+            if items is not None and len(items) >= 1:
+                return items[0]
+            else:
+                return None
 
         def info_regex():
             # try to find info using a regex pattern
+            logger.debug("using regex: " + info["pattern"])
             match = re.search(info["pattern"], content)
             if match is None:
                 logger.warning("Could not find info! (match == None) with pattern: " + info["pattern"])
-                break
+                return None
             if match.groups() is None:
                 logger.warning("match.groups() was None")
-                break
+                return None
             if len(match.groups()) <= 0:
                 logger.warning("Found match but no groups")
-                break
+                return None
 
             return match.group(1)
 
         for info in resource_dict["patterns"]:
-            # xpath is preferred
-            if "xpath" in info:
-                infodata = info_path()
-            elif "pattern" in info:
-                infodata = info_regex()
-            else:
+            if not "pattern" in info and not "xpath" in info:
                 logger.error("siteinfo entry does not contain a path or pattern!")
                 break
 
+            infodata = None
+            # xpath is preferred
+            if "xpath" in info:
+                infodata = info_xpath()
+            # try regex alternatively
+            if infodata is None and "pattern" in info:
+                infodata = info_regex()
+
+            if infodata is None:
+                logger.warning("infodata was None!")
+                break
+
+            logger.debug("\ninfodata:\n")
+            logger.debug(infodata)
+
             if infodata is None or infodata == "":
                 continue
+
             logger.info("found info data: " + infodata)
             infodata = unescape(infodata)
 
