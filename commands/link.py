@@ -46,6 +46,6 @@ class Link(Command):
         return "link"
 
     def get_help(self):
-        return "Get the link to something on the server. \nOptions: media, news, interface. Default: " + self.DEFAULT
+        return "Get the link to something on the server. \nOptions: media, siteinfo, interface. Default: " + self.DEFAULT
 
 CLASS_ = Link
