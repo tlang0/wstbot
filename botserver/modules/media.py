@@ -180,14 +180,13 @@ class MediaListBuilder:
             html_str += '<a href="{0}" title="{1}">{1}</a>'.format(url, title)
         elif type_ == "image":
             html_str += '<img src="{0}" alt="{1}" title="{2}" />'.format(url, title, title)
-        elif type_ == "youtube":
-            if title != "":
-                html_str += '<div class="item-title">{0}</div>\n'.format(title)
-            html_str += YOUTUBE_VIDEO_HTML.format(url, title)
-        elif type_ == "vimeo":
-            if title != "":
-                html_str += '<div class="item-title">{0}</div>\n'.format(title)
-            html_str += VIMEO_VIDEO_HTML.format(url, title)
+        elif title != "":
+            if type_ == "youtube":
+                html_str += '<div class="item-title"><a href="http://www.youtube.com/watch?v={0}">{1}</a></div>\n'.format(url, title)
+                html_str += YOUTUBE_VIDEO_HTML.format(url, title)
+            elif type_ == "vimeo":
+                html_str += '<div class="item-title"><a href="{0}">{1}</a></div>\n'.format(url, title)
+                html_str += VIMEO_VIDEO_HTML.format(url, title)
         else:
             return "Invalid type!\n"
 
