@@ -102,7 +102,7 @@ ul {
 hr {
     border: 0;
     /*width: 5%;*/
-    min-width: 250px;
+    max-width: 200px;
     background-image: url('../img/separator.png');
     background-repeat: no-repeat;
     background-position: center;
