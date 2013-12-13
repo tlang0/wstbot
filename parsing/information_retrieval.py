@@ -93,14 +93,17 @@ class InformationRetrieval(Parser):
             logger.debug("title: {}".format(title))
 
         if msg.strip()[-1] != "#":
-            # store media
-            if source is not None:
-                # use the media handler of the object that was used for information retrieval
-                type_, url = source.find_media_info(url)
-                self.media.store_media(url, title=title, type_=type_)
-            else:
-                # use the builtin media handlers
-                self.media.store_media(url, title=title)
+            # process all urls/links
+            matches = re.findall("(" + URL_REGEX_PREFIX + "\S+)\s*", msg)
+            for url in matches:
+                # store media
+                if source is not None:
+                    # use the media handler of the object that was used for information retrieval
+                    type_, url = source.find_media_info(url)
+                    self.media.store_media(url, title=title, type_=type_)
+                else:
+                    # use the builtin media handlers
+                    self.media.store_media(url, title=title)
 
         return info
 
@@ -252,6 +255,7 @@ class Media:
         if type_ is None:
             # try the builtin types
             media_info = chain_call(url, [self.parse_image, self.parse_link])
+
             if media_info is None:
                 logger.warning("media was not stored")
                 return 
