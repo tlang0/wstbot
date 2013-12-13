@@ -90,6 +90,7 @@ class InformationRetrieval(Parser):
         r = info_from_modules() or info_from_siteinfo() 
         if r is not None:
             info, title = r
+            logger.debug("title: {}".format(title))
 
         if msg.strip()[-1] != "#":
             # store media

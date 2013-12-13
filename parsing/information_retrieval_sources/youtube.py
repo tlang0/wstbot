@@ -55,6 +55,7 @@ class Youtube(InformationSource):
 
         raw_title = match_title.group(1)
         title = self.msg_formats.bold(self.msg_formats.red(raw_title))
+        logger.debug("title: {}".format(title))
         duration = match_duration.group(1)
         duration = duration.replace("M", "m ")
         duration = duration.replace("S", "s ")
