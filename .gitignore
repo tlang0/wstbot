@@ -7,3 +7,4 @@ __pycache__
 wstbot.conf
 *.log
 !.gitignore
+botserver/modules/files

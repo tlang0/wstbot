@@ -157,7 +157,10 @@ class Siteinfo:
             return
 
         # retrieve content
-        content = download_page(url).decode(WEB_ENCODING, "replace")
+        try:
+            content = download_page(url).decode(WEB_ENCODING, "replace")
+        except:
+            return
         if content is None:
             return
 

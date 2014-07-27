@@ -59,7 +59,12 @@ class WstXMPP(sleekxmpp.ClientXMPP):
             return
         if formatted:
             html_message = "<span>" + message + "</span>"
-            self.send_message(mto=self.room, mbody=message, mhtml=html_message, mtype="groupchat")
+            try:
+                self.send_message(mto=self.room, mbody=message, mhtml=html_message, mtype="groupchat")
+            except:
+                message = "something went wrong."
+                html_message = "<span>" + message + "</span>"
+                self.send_message(mto=self.room, mbody=message, mhtml=html_message, mtype="groupchat")
         else:
             # send every line seperately
             lines = message.split("\n")
