@@ -1,0 +1,36 @@
+#dropper {
+    display:block;
+    height:100px;
+    line-height:100px;
+    border:dotted black 3px;
+    text-align:center;
+    overflow:hidden;
+}
+#dropper img {
+    display:none;
+}
+#counter {
+    color: firebrick;
+}
+div.entry {
+    margin:5px;
+    padding:8px;
+    border:solid grey 1px;
+    position:relative;
+    overflow:auto;
+}
+.entry img {
+    float:right;
+    vertical-align:middle;
+    max-width:400px;
+}
+.entry label {
+    font-weight:bold;
+}
+.entry a {
+    color: darkseagreen;
+    text-decoration:none;
+}
+.entry a:hover {
+    color: mediumseagreen;
+}

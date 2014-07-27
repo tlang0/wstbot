@@ -1,3 +1,4 @@
 modules:
 - name: media
 - name: siteinfo
+- name: upload
