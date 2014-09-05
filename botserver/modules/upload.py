@@ -9,7 +9,7 @@
 # (at your option) any later version.
 #
 # wstbot is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# but WITHOUT ANY WARRANTY without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
@@ -19,8 +19,9 @@
 
 import os
 import cherrypy
-import uuid
 import mimetypes
+import string
+import random
 from urllib.parse import quote_plus
 from urllib.parse import unquote_plus
 from botserver.util import get_template_content
@@ -39,24 +40,29 @@ class Uploader:
     @cherrypy.expose
     def index(self):
         html_template = get_template_content(DEFAULT_FILE)
-        template = Template(html_template);        
+        template = Template(html_template)        
         return template.substitute(actionUrl=(self.get_request_url() + "submit"))
         
-    @cherrypy.expose   
+    @cherrypy.expose
     def submit(self, file):
-        url = self.get_request_url();
+        url = self.get_request_url()
         url = url[0:url.find("submit")]
         
-        filename = quote_plus(uuid.uuid4().hex +  "_" + file.filename);           
-        savedFile = open(os.path.join(absDir, dir, filename), "wb")
+        filename = quote_plus(file.filename)
+        id = ""
+        # if the plain filename is already in use we generate an id with at least 6 characters
+        while os.path.isfile(os.path.join(absDir, dir, filename)) and len(id) < 6 or os.path.isfile(os.path.join(absDir, dir, id + "_" + filename)):
+            id += random.choice(string.ascii_letters)
+        savedFile = open(os.path.join(absDir, dir, (id + "_" if id else "") + filename), "wb")
         while True:
             data = file.file.read(8192)
             if not data:
-                break            
+                break          
             savedFile.write(data)
         savedFile.close()
         
-        filename = quote_plus(filename)
+        if id:
+          filename = id + "/" + filename
         out = "<div class='entry'>"
         if (file.content_type.value.find("image") > -1): 
             out +="<img src='" + url + "show/" + filename + "'>"            
@@ -65,28 +71,40 @@ class Uploader:
                 Download link: <a href='" + url + "download/" + filename + "'>" + url + "download/" + filename + "</a><br>\
                 Delete link: <a href='" + url + "delete/" + filename + "'>" + url + "delete/" + filename + "</a>\
                 </div>"
-        return out;
+        return out
         
-    @cherrypy.expose   
-    def show(self, filename):
+    @cherrypy.expose
+    def show(self, id, filename=None):
+        if not filename:
+          filename = id
+        else:
+          filename = id + "_" + filename
         return self.serve_file(filename, False)
         
-    @cherrypy.expose   
-    def download(self, filename):
+    @cherrypy.expose
+    def download(self, id, filename=None):
+        if not filename:
+          filename = id
+        else:
+          filename = id + "_" + filename
         return self.serve_file(filename, True)
         
-    @cherrypy.expose   
-    def delete(self, filename):
+    @cherrypy.expose
+    def delete(self, id, filename=None):
+        if not filename:
+          filename = id
+        else:
+          filename = id + "_" + filename
         path = os.path.join(absDir, dir, filename)
         try:
             os.remove(path)
         except os.error as e:
             return "Error: File not found. %s" % e
-        return "File succesfully deleted.";
+        return "File succesfully deleted."
         
     def get_request_url(self):
         base = cherrypy.request.base
-        path = cherrypy.request.path_info;
+        path = cherrypy.request.path_info
         if not path.endswith("/"):
             path = path + "/"
         return base + path
@@ -98,7 +116,7 @@ class Uploader:
         mime =  mimetypes.guess_type(filename)[0]
         if (not mime): 
             mime = "application/octet-stream"
-        orgfilename = unquote_plus(filename[filename.find("_") + 1:]);
+        orgfilename = unquote_plus(filename[filename.find("_") + 1:])
         if (download):
             disposition = "attachment"
         try:
