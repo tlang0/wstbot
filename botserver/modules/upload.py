@@ -22,8 +22,6 @@ import cherrypy
 import mimetypes
 import string
 import random
-from urllib.parse import quote_plus
-from urllib.parse import unquote_plus
 from botserver.util import get_template_content
 from string import Template
 from cherrypy.lib.static import serve_file
@@ -48,7 +46,7 @@ class Uploader:
         url = self.get_request_url()
         url = url[0:url.find("submit")]
         
-        filename = quote_plus(file.filename)
+        filename = file.filename
         id = ""
         # if the plain filename is already in use we generate an id with at least 6 characters
         while os.path.isfile(os.path.join(absDir, dir, filename)) and len(id) < 6 or os.path.isfile(os.path.join(absDir, dir, id + "_" + filename)):
@@ -76,31 +74,33 @@ class Uploader:
     @cherrypy.expose
     def show(self, id, filename=None):
         if not filename:
-          filename = id
-        else:
-          filename = id + "_" + filename
-        return self.serve_file(filename, False)
+            filename = id
+            id = None   
+        return self.serve_file(id, filename, False)
         
     @cherrypy.expose
     def download(self, id, filename=None):
         if not filename:
-          filename = id
-        else:
-          filename = id + "_" + filename
-        return self.serve_file(filename, True)
+            filename = id
+            id = None   
+        return self.serve_file(id, filename, True)
         
     @cherrypy.expose
     def delete(self, id, filename=None):
         if not filename:
-          filename = id
-        else:
-          filename = id + "_" + filename
-        path = os.path.join(absDir, dir, filename)
+            filename = id
+            id = None            
+        path = self.get_path(id, filename)
         try:
             os.remove(path)
         except os.error as e:
             return "Error: File not found. %s" % e
         return "File succesfully deleted."
+    
+    def get_path(self, id, filename):
+        if id:
+            filename = id + "_" + filename
+        return os.path.join(absDir, dir, filename)
         
     def get_request_url(self):
         base = cherrypy.request.base
@@ -109,18 +109,16 @@ class Uploader:
             path = path + "/"
         return base + path
     
-    
-    def serve_file(self, filename, download=False):
+    def serve_file(self, id, filename, download=False):
         disposition = None
-        path = os.path.join(absDir, dir, filename)
+        path = self.get_path(id, filename)
         mime =  mimetypes.guess_type(filename)[0]
         if (not mime): 
             mime = "application/octet-stream"
-        orgfilename = unquote_plus(filename[filename.find("_") + 1:])
         if (download):
             disposition = "attachment"
         try:
-            return serve_file(path, mime, disposition, orgfilename, True)
+            return serve_file(path, mime, disposition, filename, True)
         except cherrypy.NotFound as e:
             return "Error: File not found."
         
