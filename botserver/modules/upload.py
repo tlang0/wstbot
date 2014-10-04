@@ -61,14 +61,14 @@ class Uploader:
         
         if id:
           filename = id + "/" + filename
-        out = "<div class='entry'>"
+        out = '<div class="entry">'
         if (file.content_type.value.find("image") > -1): 
-            out +="<img src='" + url + "show/" + filename + "'>"            
-        out += "<label>"+ escape(file.filename) +"</label><br>\
-                File link: <a href='" + url + "show/" + filename + "'>" + url + "show/" + filename + "</a><br>\
-                Download link: <a href='" + url + "download/" + filename + "'>" + url + "download/" + filename + "</a><br>\
-                Delete link: <a href='" + url + "delete/" + filename + "'>" + url + "delete/" + filename + "</a>\
-                </div>"
+            out += '<img src="' + url + 'show/' + filename + '">'            
+        out += '<label>'+ escape(file.filename) + '</label><br>\
+                File link: <a href="' + url + 'show/' + filename + '">' + url + 'show/' + filename + '</a><br>\
+                Download link: <a href="' + url + 'download/' + filename + '">' + url + 'download/' + filename + '</a><br>\
+                Delete link: <a href="' + url + 'delete/' + filename + '">' + url + 'delete/' + filename + '</a>\
+                </div>'
         return out
         
     @cherrypy.expose
