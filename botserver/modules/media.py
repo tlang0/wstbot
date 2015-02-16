@@ -51,7 +51,7 @@ class MediaListBuilder:
         self.is_search = False
 
     @cherrypy.expose
-    def load(self, nr=0, ascending=False, search=None):
+    def load(self, nr=0, ascending=False, search_text=None):
         """Return items starting at nr"""
 
         self.nr = nr
@@ -61,13 +61,16 @@ class MediaListBuilder:
         # get the media data and construct the page
         with sqlite3.connect(MEDIA_DB_PATH) as conn:
             cur = conn.cursor()
-            if search is not None:
-                if search.text == "":
+            if search_text is not None:
+                if search_text == "":
                     return "Empty search!"
                 # filter on title and url
-                qry = ("select * from media where title like '%' || ? || '%' or url like '%' "
-                    + "|| ? || '%' order by id " + order)
-                data = (search.text, search.text)
+                keywords = search_text.split()
+                where = " and ".join(["(title like '%' || ? || '%' or url like '%' || ? || '%')"] * len(keywords))
+                qry = ("select * from media where " + where + " order by id " + order + " limit ?, ?")
+                keywords = keywords * 2
+                keywords.sort()
+                data = tuple(keywords + [nr, ITEMS_PER_PAGE])
             else:
                 qry = "select * from media order by id " + order + " limit ?, ?"
                 data = (nr, ITEMS_PER_PAGE)
@@ -81,16 +84,13 @@ class MediaListBuilder:
         return htmldata
 
     @cherrypy.expose
-    def index(self, nr=0, ascending=False, search_text=None, filter_on=None):
+    def index(self, nr=0, ascending=False, search_text=None):
         html_template = get_template_content(DEFAULT_FILE)
         template = Template(html_template)
 
         self.is_search = False if search_text is None else True
-        search = None
-        if search_text is not None:
-            search = Search(search_text, filter_on)
         
-        htmldata = self.load(nr, ascending=ascending, search=search)
+        htmldata = self.load(nr, ascending=ascending, search_text=search_text)
         new_html = template.substitute(media=htmldata, nr=self.nr, search=self.is_search)
 
         return new_html
@@ -198,12 +198,6 @@ class MediaListBuilder:
 
         html_str += "</li>\n"
         return html_str
-
-class Search:
-
-    def __init__(self, text, filter_on):
-        self.text = text
-        self.filter_on = filter_on
 
 def get():
     builder = MediaListBuilder()
