@@ -28,14 +28,6 @@ $(function () {
         $(this).siblings(".delete-button").show();
     }
 
-    /***** Search *****/
-
-    // if it's a search
-    if ($("body").attr("data-search") === "True") {
-        LOADED_ALL = true;
-        $("#load-button").hide();
-    }
-
     /***** Deleting *****/
 
     function deleteItemClick() {
@@ -85,7 +77,7 @@ $(function () {
         }
         nr = parseInt(nr, 10) + ITEMS_PER_PAGE;
         // reached the end?
-        $.get("/media/load/" + nr, function (data) {
+        $.get("/media/load/" + nr + window.location.search, function (data) {
             var dataDOM = $.parseHTML(data);
 
             // hide videos in new content
