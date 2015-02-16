@@ -285,7 +285,7 @@ class Media:
             return None
 
         # prefix for URLs in general
-        match = re.search("(" + URL_REGEX_PREFIX + ".*(\.jpeg|\.jpg|\.png|\.gif))", url)
+        match = re.search("(" + URL_REGEX_PREFIX + ".*(\.jpeg|\.jpg|\.png|\.gif))", url, re.IGNORECASE)
         if match is None:
             return None
 
