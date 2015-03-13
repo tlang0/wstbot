@@ -6,11 +6,11 @@
     text-align:center;
     overflow:hidden;
 }
-#dropper img {
-    display:none;
-}
 #counter {
     color: firebrick;
+}
+#fileInput {
+    display:none;
 }
 div.entry {
     margin:5px;
