@@ -21,8 +21,8 @@ import sys
 import logging
 import getpass
 import sleekxmpp
+from util import escape
 from optparse import OptionParser
-from xml.sax.saxutils import escape, unescape
 
 class WstXMPP(sleekxmpp.ClientXMPP):
 
@@ -57,17 +57,19 @@ class WstXMPP(sleekxmpp.ClientXMPP):
         """formatted means that it is an html message"""
         if message is None:
             return
-        if formatted:
-            html_message = "<span>" + message + "</span>"
-            try:
-                self.send_message(mto=self.room, mbody=message, mhtml=html_message, mtype="groupchat")
-            except:
-                message = "something went wrong."
+
+        try:
+            if formatted:
                 html_message = "<span>" + message + "</span>"
                 self.send_message(mto=self.room, mbody=message, mhtml=html_message, mtype="groupchat")
-        else:
-            # send every line seperately
-            lines = message.split("\n")
-            for line in lines:
-                self.send_message(mto=self.room, mbody=line, mtype="groupchat")
-
+            else:
+                # send every line seperately
+                lines = message.split("\n")
+                for line in lines:
+                    self.send_message(mto=self.room, mbody=line, mtype="groupchat")
+        except Exception as e:
+            print("ERROR sending message: " + message)
+            message = "Error. Tried to send message: <br/>\n" + escape(message)
+            message += "<br/>\n<br/>\nException was: <br/>\n" + escape(str(e))
+            html_message = "<span>" + message + "</span>"
+            self.send_message(mto=self.room, mbody=message, mhtml=html_message, mtype="groupchat")

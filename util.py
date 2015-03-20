@@ -28,6 +28,9 @@ from wstbot_locals import WEB_READ_MAX, WEB_ENCODING, URL_REGEX_PREFIX
 
 logger = logging.getLogger("wstbot")
 
+def escape(message):
+    return html.escape(message)
+
 def unescape(message):
     parser = html.parser.HTMLParser()
     return parser.unescape(message)
@@ -70,7 +73,7 @@ def chain_call(value, functions):
 
 def apply_seq(function, sequence):
     """Applies a function to every element of the sequence"""
-    for e in sequence: 
+    for e in sequence:
         function(e)
 
 def str_list_to_int(l):
@@ -87,8 +90,8 @@ def str_list_to_int(l):
     return new_list
 
 def get_modules(path):
-    """Return a list of python modules in a given path. 
-    Files not ending with '.py' are ignored. 
+    """Return a list of python modules in a given path.
+    Files not ending with '.py' are ignored.
     May throw an OSError."""
 
     modules = []

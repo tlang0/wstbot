@@ -68,7 +68,7 @@ class WstBot:
         # add handlers
         logger.addHandler(stream_handler)
         logger.addHandler(file_handler)
-        
+
         # function to instantiate command and parsing objects
         instantiator = lambda class_: class_(self)
 
@@ -84,7 +84,7 @@ class WstBot:
                 return cmd_obj
         return None
 
-    def handle_message(self, nick, msg):    
+    def handle_message(self, nick, msg):
         # parsing. accept direct messages too
         if msg is None:
             logger.warning("msg was None")
@@ -107,7 +107,7 @@ class WstBot:
         # empty command?
         if ucmd.strip() == "":
             return
-        
+
         # !help command
         # help messages should generally be unformatted
         if firstword == "!help":
@@ -120,7 +120,7 @@ class WstBot:
                         self.send_room_message(help_msg)
                     else:
                         self.send_room_message(NO_HELP_MSG)
-                        
+
             # general help
             else:
                 cmds = ""
@@ -143,7 +143,7 @@ class WstBot:
     def on_me_join(self, channel):
         hello_msg = HELLOMSG.format(channel=channel)
         self.send_room_message(hello_msg)
-        
+
     def on_join(self, nick):
         welcome_msg = WELCOMEMSG.format(nick=nick)
         fortune_cmd_obj = self.get_command_object("fortune")
@@ -151,10 +151,9 @@ class WstBot:
             fortune = fortune_cmd_obj.do_cmd("", nick)
             welcome_msg += " " + FORTUNEMSG.format(fortune=fortune)
         self.send_room_message(welcome_msg)
-        
+
     # Handle all received data
     def on_receive(self, line):
         # This could be quakenet specific
         if "End of" in line and "376" in line:
             self.join(self.chan)
-

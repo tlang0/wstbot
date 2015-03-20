@@ -32,7 +32,7 @@ logging.basicConfig(level=logging.INFO, format=STREAM_LOG_FORMAT)
 def wstbot_load(debug=False):
     parser = configparser.SafeConfigParser()
     parser.read("wstbot.conf")
-    
+
     category = "xmpp_connection"
 
     account = parser.get(category, "account")
@@ -58,7 +58,10 @@ class WstBotXMPP(WstXMPP):
         if "!users" in msg["body"]: # handle xmpp-specific commands
             self.send_user_list()
         else: # handle bot commands
-            self.wstbot.handle_message(msg["from"].resource, msg["body"])
+            try:
+                self.wstbot.handle_message(msg["from"].resource, msg["body"])
+            except Exception as e:
+                self.send_room_message("An error occurred during message handling. Exception: " + str(e))
 
     def muc_online(self, presence):
         room_name = self.room_local_name(presence["muc"]["room"])

@@ -37,11 +37,13 @@ class Link(Command):
             return server_url + "/media"
         elif argstr == "siteinfo" or argstr == "regex" or argstr == "news":
             return server_url + "/siteinfo"
+        elif argstr == "upload":
+            return server_url + "/upload"
         elif argstr == "interface":
             return address + ":" + web_interface_port
         else:
             return server_url + self.DEFAULT
-    
+
     def get_cmd(self):
         return "link"
 

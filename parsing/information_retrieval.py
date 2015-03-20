@@ -25,7 +25,7 @@ import logging
 import sqlite3
 import lxml.html
 from parsing.parser import Parser
-from util import (parse_for_url, unescape, get_modules_objects, 
+from util import (parse_for_url, escape, unescape, get_modules_objects, 
                   first, chain_call, download_page, download_page_decoded)
 from wstbot_locals import WEB_ENCODING, URL_REGEX_PREFIX
 
@@ -218,6 +218,7 @@ class Siteinfo:
 
             logger.info("found info data: " + infodata)
             infodata = unescape(infodata)
+            infodata = escape(infodata)
 
             infodata = infodata.strip()
             if title is None:
