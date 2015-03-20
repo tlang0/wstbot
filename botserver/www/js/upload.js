@@ -1,25 +1,38 @@
 function ready() {
-  document.getElementById('dropper').addEventListener('dragover', function (e) {              
+  var dropper = document.getElementById('dropper');
+  var fileInput = document.getElementById('fileInput');
+  
+  dropper.addEventListener('dragover', function (e) {              
     e.preventDefault();
   });
-  document.getElementById('dropper').addEventListener('drop', function (e) {   
+  dropper.addEventListener('drop', function (e) {   
     e.preventDefault();
     while (e.dataTransfer == null && e.originalEvent != null) {
       e = e.originalEvent;
     }
-    var files = e.dataTransfer.files;    
+    var files = e.dataTransfer.files;
     if (files) {           
       send(files);
     }
     return false;
   });
+  var token;
+  dropper.addEventListener('click', function (e) {
+    fileInput.click();
+  });
+  fileInput.onchange = function (e) {
+    var files = fileInput.files;
+    if (files) {           
+      send(files);
+    }
+  }
       
-  registerOnPaste(document.getElementById('dropper'), function (data){
+  registerOnPaste(dropper, function (data){
     send([dataURItoBlob('data:text/plain,' + data)])
   },  function (data){
     send([dataURItoBlob(data)]);
   })
-  .focus(); 
+  .focus();
 }
 
 var dataURItoBlob = function (dataURI) {
