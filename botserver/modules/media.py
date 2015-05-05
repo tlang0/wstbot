@@ -163,6 +163,7 @@ class MediaListBuilder:
         url = row["url"]
         if url[-1] == os.linesep:
             url = url[:-1]
+        url = url.strip();
         type_ = row["type"]
         # start constructing the output
         html_str = "<li>"
@@ -177,7 +178,16 @@ class MediaListBuilder:
         if type_ == "link":
             if title == "":
                 title = url
-            html_str += '<a href="{0}" title="{1}">{1}</a>'.format(url, title)
+
+            if "." in url:
+                suffix = url.rsplit(".", 1)[-1]
+            else:
+                suffix = ""
+
+            if suffix in ("webm", "mp4"):
+                html_str += '<video width="640" height="480" controls><source src="{0}" type="video/{1}"></video>'.format(url, suffix)
+            else:
+                html_str += '<a href="{0}" title="{1}">{1}</a>'.format(url, title)
         elif type_ == "image":
             html_str += '<img src="{0}" alt="{1}" title="{2}" />'.format(url, title, title)
         elif title != "":
