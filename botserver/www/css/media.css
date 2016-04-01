@@ -2,6 +2,7 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
+    font-family: Tahoma, Geneva, sans-serif;
 }
 
 a {
@@ -32,6 +33,13 @@ a:active {
     top: 0;
     left: 0;
     z-index: 1;
+    font-size: 0.8em;
+    font-family: Tahoma, Geneva, sans-serif;
+}
+
+#search-panel input {
+    font-size: 2em;
+    font-family: Tahoma, Geneva, sans-serif;
 }
 
 #media-content {
@@ -39,7 +47,7 @@ a:active {
 }
 
 #media-content a, .item-title {
-    font-size: 12pt;
+    font-size: 1.2em;
     z-index: 0;
 }
 
